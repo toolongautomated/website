@@ -1,0 +1,152 @@
+/* Theme Toggles */
+.theme-toggles {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: 1rem;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.theme-toggle:hover {
+    opacity: 1;
+}
+
+.theme-toggle.active {
+    opacity: 1;
+    background-color: rgba(185, 150, 100, 0.2);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: var(--popup-overlay);
+}
+
+.modal-content {
+    margin: 10% auto;
+    border: 2px solid var(--border-color);
+    width: 30%;
+    position: relative;
+    background-color: var(--bg-color);
+}
+
+.modal-content::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+    background-image: radial-gradient(circle, var(--shadow-color) 1px, transparent 1px);
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Image Zoom */
+.zoomable {
+    cursor: zoom-in;
+    transition: transform 0.3s;
+}
+
+.zoom-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--popup-overlay);
+    z-index: 1000;
+    cursor: zoom-out;
+}
+
+.zoomed-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    border: 2px solid var(--border-color);
+}
+
+.zoomed-container::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+}
+
+.zoomed-image {
+    max-width: 90vw;
+    max-height: 80vh;
+    display: block;
+}
+
+.zoomed-caption {
+    text-align: center;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Social Links */
+.social-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+}
+
+[data-theme="dark"] .social-icon {
+    filter: invert(1);
+    fill: #fff;
+    background: transparent !important;
+}
+
+.social-handle {
+    text-decoration: none;
+}
+
+.social-handle:hover {
+    font-weight: normal;
+    background-color: rgba(185, 150, 100, 0.2);
+}

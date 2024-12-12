@@ -1,0 +1,110 @@
+[data-theme="light"] {
+    --bg-color: #fff;
+    --text-color: #333;
+    --border-color: #000;
+    --hover-bg: #F1EAE0;
+    --key-concept-bg: #f8f8f8;
+    --popup-overlay: rgba(255, 255, 255, 0.85);
+    --shadow-color: #000;
+}
+
+[data-theme="dark"] {
+    --bg-color: #282828;
+    --text-color: #bbb;
+    --border-color: #000;
+    --hover-bg: #453E34;
+    --key-concept-bg: #222;
+    --popup-overlay: rgba(40, 40, 40, 0.85);
+    --shadow-color: #000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: none;
+    overflow-x: hidden;
+}
+
+main {
+    background: none;
+}
+
+p {
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+}
+
+ol li {
+    font-size: 1.1rem;
+}
+
+ol li pre,
+ol li code {
+    font-size: 0.8rem;
+}
+
+ul li {
+    font-size: 1.1rem;
+}
+
+ul li pre,
+ul li code {
+    font-size: 0.8rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    margin: 1.5rem 0 1rem;
+}
+
+a {
+    text-decoration: none;
+    padding: 0 0.25rem;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+a:hover {
+    background-color: rgba(185, 150, 100, 0.3);
+}
+
+p a {
+    border-bottom: 1px dotted var(--text-color);
+}
+
+li a {
+    border-bottom: 1px dotted var(--text-color);
+}
