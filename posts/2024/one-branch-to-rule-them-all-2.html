@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>one branch to rule them all | guided series #2</title>
+    <link rel="icon" type="image/png" href="../../assets/logo-dark.png">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/light-theme.css">
+    <link rel="stylesheet" href="../../styles/dark-theme.css">
+    <link rel="stylesheet" href="../../styles/mobile.css">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-light.min.css" class="theme-specific"
+        data-theme="light">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-dark.min.css" class="theme-specific"
+        data-theme="dark">
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <a href="../../index.html" class="nav-logo">
+                <img src="../../assets/logo-dark.png" class="logo-image" alt="Logo">
+                <span class="site-title">too long; automated</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../../index.html" style="border-bottom: none;">home</a></li>
+                <!-- <li><a href="../../links.html">Links</a></li> -->
+                <li><a href="../../archive.html" style="border-bottom: none;">archive</a></li>
+                <!-- <li><a href="../../about.html">About</a></li> -->
+            </ul>
+            <ul class="nav-theme-toggles">
+                <li>
+                    <button class="theme-toggle" data-theme="light" title="Light theme">☀️</button>
+                    <button class="theme-toggle" data-theme="dark" title="Dark theme">🌙</button>
+                    <button class="theme-toggle" data-theme="system" title="System theme">💻</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <figure class="article-internal-image">
+            <img src="2/image-wide.png" alt="Descriptive alt text">
+        </figure>
+
+        <h1>one branch to rule them all | guided series #2</h1>
+
+        <p class="article-subtitle">
+            A lot of us deploy our apps to multiple cloud environments (or soon
+            will). Now that you know where to start, let's scope and implement
+            some of the ideas!
+        </p>
+
+        <div class="article-meta">December 13, 2024</div>
+
+        <div class="content-separator"></div>
+
+
+        <p>
+            Welcome (back?), dear reader! 🙌🏼
+        </p>
+
+        <p>
+            <b>tl;dr:</b> My goal for this short series is very simple: <b>teach
+                you by example</b>. Together, we’re going through the full process I
+            follow to solve various problems:
+        </p>
+
+        <ul class="article-list" style="list-style: none;">
+            <li>🔍 <b>gather and understand requirements</b></li>
+            <li>🧠 <b>brainstorm solutions</b></li>
+            <li>🎯 <b>scope</b></li>
+            <li>👨🏻‍💻 <b>implement & test</b> (iterate until convergence)</li>
+            <li>🛑 <b>stop</b> (sounds easy? :p)</li>
+        </ul>
+
+        <p>
+            What are we working on in this series?
+        </p>
+
+        <div class="key-concept">
+            <b>🤔 PROBLEM DEFINITION</b>
+
+            How to deploy an app to multiple environments so that each env can
+            run a different version of the application?
+        </div>
+
+        <div class="content-separator"></div>
+
+        <p>
+            In the previous post, I described the first two steps from the list
+            above – we gathered and understood the requirements, and brainstormed
+            various solutions. If you haven’t already read this one, it may be a
+            good time to do so as we’ll be building on top of it 👇🏼
+        </p>
+
+        <div class="article-navigation" style="margin: 2rem 0;">
+            <div class="nav-buttons">
+                <a href="one-branch-to-rule-them-all-1.html" class="nav-button prev-article" style="max-width: 100%;">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← read part 1 of the series</div>
+                            <div class="nav-title">one branch to rule them all | guided series #1</div>
+                        </div>
+                        <img src="2/image-wide.png" alt="Part 1" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+        <p>
+            If you don’t have time to read this, it’s okay! we’ll do a quick
+            recap in a minute.
+        </p>
+
+        <div class="table-of-contents">
+            <div class="toc-title">table of contents</div>
+            <pre>
+<span class="ascii">.</span>
+<span class="ascii">├── </span>⏮ <a href="#recap">Recap</a>
+<span class="ascii">│</span>
+<span class="ascii">├── </span>🎯 <a href="#scope">Scope</a>
+│   <span class="ascii">│</span>
+│   <span class="ascii">├── </span>📋 <a href="#req-1-no-brainer-git-flow">req #1: No-brainer git flow</a>
+│   <span class="ascii">├── </span>📋 <a href="#req-2-application-needs-to-be-versioned">req #2: Application needs to be versioned</a>
+│   <span class="ascii">└── </span>📋 <a href="#req-3-4-configurable-deployment-environments">req #3–4: Configurable deployment targets</a>
+│
+<span class="ascii">└── </span>👨🏻‍💻 <a href="#implement-test">Implement & test</a>
+    <span class="ascii">│</span>
+    <span class="ascii">├── </span><a href="#reference-point">Reference point</a>
+    <span class="ascii">└── </span><a href="#step-1-version-the-application">Step 1: version the application</a>
+        <span class="ascii">│</span>
+        <span class="ascii">├── </span><a href="#git-tagging">git tagging</a>
+        <span class="ascii">└── </span><a href="#containerize-the-application">Containerize the application</a>
+            </pre>
+        </div>
+
+        <div class="content-separator"></div>
+
+        <h1 id="recap">⏮ Recap</h1>
+
+        <p>
+            It’s been quite a lot of content to digest previously, so what would
+            you say we recap?
+        </p>
+
+        <p>
+            Our <b>problem has been defined</b> as follows:
+        </p>
+
+        <div class="key-concept">
+            How to deploy an app to multiple environments so that each env can run a
+            different version of the application?
+        </div>
+
+        <p>
+            Firstly, based on the analysis of the problem and a tiny bit of
+            additional specification, we’ve concluded with the following <b>list
+                of requirements</b>:
+        </p>
+
+        <ol class="article-list">
+            <li>Git flow must be a no-brainer – we don’t want to deal with
+                multiple branches that will have to be frequently synchronized.
+            </li>
+            <li>Application needs to be versioned.</li>
+            <li>It must be possible to deploy the required version of the
+                application to the selected deployment environment.</li>
+            <li>Every environment runs only one version of the application at the
+                same time.</li>
+            <li>[bonus] automate manual processes to a reasonable extent.</li>
+        </ol>
+
+        <p>
+            With these in mind, we’ve brainstormed various approaches that could
+            be used to fulfill the requirements.
+        </p>
+
+
+        <p>
+            📋 <b>req #1: repository branching & development strategy:</b>
+        </p>
+
+        <p>
+            option #1: git-flow
+            <br>
+            option #2: pure trunk-based
+            <br>
+            option #3: permissive trunk-based
+        </p>
+
+        <p>
+            📋 <b>req #2: application versioning:</b>
+        </p>
+
+        <p>
+            option #1: git tagging
+            <br>
+            option #2: containers with tagging
+        </p>
+
+        <p>
+            📋 <b>req #3: configurable deployment environments:</b>
+        </p>
+
+        <p>
+            option #1: config files
+            <br>
+            option #2: helm charts
+            <br>
+            option #3: branch-based deployment
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h1 id="scope">🎯 Scope</h1>
+
+        <p>
+            I call the third step of my problem solving process <i>scoping</i>.
+        </p>
+
+        <div class="key-concept">
+            The goal here is to look at the list of requirements and the options for
+            their solutions to pick the one that will be implemented.
+        </div>
+
+        <p>
+
+            You can treat is as the symbolic conclusion of the design process.
+            When done properly, scoping should let you implement a functional
+            PoC. Keep in mind that the solutions you pick may lead to issues
+            that you haven’t predicted. In such cases, it may be necessary to go
+            back and re-scope the options to pick another alternative. And it’s
+            okay. Remember–software development is an iterative process!
+        </p>
+
+        <p>
+            I’d say that <b>the number of times when it’s necessary to go back
+                and forth between the implementation and scoping phases is inversely
+                proportional to the experience you have in the field</b> – the more
+            exposition you get to various problems, the better your designs and
+            predictions, thus the less iteration is necessary.
+        </p>
+
+        <p>
+            With that, let’s scope, requirement by requirement.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h2 id="req-1-no-brainer-git-flow">📋 req #1: No-brainer git flow</h2>
+
+        <p>
+            option #1: git-flow
+            <br>
+            option #2: pure trunk-based
+            <br>
+            <b>👉🏼 option #3: permissive trunk-based</b>
+        </p>
+
+        <p>
+            The choice is easy: git-flow is too complex for our use case as we
+            don’t want to deal with multiple branches that will have to be
+            frequently synchronized. Pure trunk-based development is a little
+            bit too hardcore when it comes to working in slightly larger teams
+            and requires automated CI upfront. Permissive trunk-based approach
+            with short-lived feature branches will be a perfect choice. It
+            strikes great balance between the complexity and efficiency 👌🏼.
+        </p>
+
+        <p>
+            If you’re interested, you can read about considered options <a
+                href="one-branch-to-rule-them-all-1.html#req-1-no-brainer-git-flow">in
+                the previous post</a>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h2 id="req-2-application-needs-to-be-versioned">📋 req #2: Application needs to be versioned</h2>
+
+        <p>
+            👉🏼 <b>option #1: git tagging</b>
+            <br>
+            👉🏼 <b>option #2: containers with tagging</b>
+        </p>
+
+        <p>
+            Didn’t expect that one! To be honest, the main solution that I’m
+            going to pick is option #2. As mentioned in the brainstorming step,
+            introducing containerization to your project has a lot of benefits
+            and its worth every minute invested in. It will allow the
+            application to be versioned conveniently, plus the execution
+            environment will be clearly defined. Win-win.
+        </p>
+
+        <p>
+            However, we’ll also introduce git tagging.
+        </p>
+
+        <p>
+            Why?
+        </p>
+
+        <p>
+            To make it easier to check out the code to specific version of the
+            application to play/analyze/debug it. It’s much easier and faster to
+            check out to a specific git tag than to spin up a container. Plus,
+            application containers are (at least should) be <i>minimal</i>,
+            meaning that no additional tools for testing/debugging should be
+            included within them. This is what makes it more challenging to
+            debug the code from within them, hence local check out may be handy
+            in many situations.
+        </p>
+
+        <p>
+            Read more about the options <a
+                href="one-branch-to-rule-them-all-1.html#req-2-application-needs-to-be-versioned">here</a>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h2 id="req-3-4-configurable-deployment-environments">📋 req #3-4: Configurable deployment targets</h2>
+
+        <p>
+            👉🏼 <b>option #1: config files</b>
+            <br>
+            👉🏼 option #2: helm charts
+            <br>
+            👉🏼 option #3: branch-based deployment
+        </p>
+
+        <p>
+            Firstly, let’s go with the easy one to REJECT: helm charts. As part
+            of this tutorial, we’re not going to build anything that will be
+            deployed to Kubernetes, hence the decision. Nonetheless, the
+            proposed solution will be Kubernetes-compatible to a certain degree.
+        </p>
+
+        <p>
+            Secondly, branch-based deployment. Our selected branching strategy
+            is “permissive trunk-based development”. We’ll have one main
+            branch, and allow for several short-lived feature branches. That’s
+            all. Branch-based deployment strategy would require long-lived
+            branches other than the main itself (e.g. develop, etc.). There are
+            no such branches allowed, so branch-based deployment goes to trash.
+        </p>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/289glLCgxIQAAAAd/tenor.gif" alt="Dumping trash"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center;">Source: <a
+                    href="https://tenor.com/pl/view/dumping-trash-daniel-labelle-frustrated-garbage-trash-gif-27186872">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            What’s left is the approach leveraging config files. It’s simple,
+            versatile, and effective, and will fit our design perfectly.
+        </p>
+
+        <p>
+            Details on all the options are <a
+                href="one-branch-to-rule-them-all-1.html#req-3-4-configurable-deployment-targets">here</a>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Uff, scoping done! 😅
+        </p>
+
+        <p>
+            Now, the only thing left is to implement and test all of that.
+            Easy-peasy [sarcasm]
+        </p>
+
+        <h1 id="implement-test">👨🏻‍💻 Implement & test</h1>
+
+        <p>
+            I’ve divided this phase into incremental steps so that it’s easier
+            for you to see gradual improvements introduced to the code and the
+            project overall, and how to fulfill certain requirements. The code
+            available on GitHub, check it out <a href="https://github.com/toolongautomated/tutorial-1">here</a>. For
+            every implementation milestone, I’ve prepared a dedicated tag in the
+            repository so that it’s easier for you to either checkout the code
+            and play with it and, of course, fork it if that’s what you’d like
+            to do.
+        </p>
+
+
+        <h2 id="reference-point">Reference point</h2>
+
+        <p>
+            Let’s start with the reference point of the project. Go to <a
+                href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point">GitHub's
+                UI</a> or run the command below on your machine to checkout the
+            code:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+git checkout 1-reference-point
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            This is the state of the repository you’ve been given. We’ll take it from here. It contains some basic stuff
+            like:
+        </p>
+
+        <ul class="article-list">
+            <li>simple flask server displaying welcome message (<a
+                    href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point/app/src">app/src</a>
+                directory)</li>
+            <li>smoke unit test and a placeholder for integration tests (<a
+                    href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point/app/test/unit">app/test/unit</a>
+                and <a
+                    href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point/app/test/integration">app/test/integration</a>
+                dirs)</li>
+            </li>
+            <li>starter <a
+                    href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point/README.md">README</a>
+                file</li>
+        </ul>
+
+        <p>
+            Ensure docker and Python are installed in your development
+            environment, then install the requirements, and continue to either
+            run the tests or the application locally. Refer to the <a
+                href="https://github.com/toolongautomated/tutorial-1/tree/1-reference-point/README.md">README</a>
+            for details on how to do that.
+        </p>
+
+        <p>
+            Once you run the application locally, you should see the following screen 👇🏼
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="3/welcome-screen.png" alt="Welcome screen" class="zoomable" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center; padding: 1rem;">
+                Welcome message displayed to the user by the Flask server.
+            </figcaption>
+        </figure>
+
+        <h2 id="step-1-version-the-application">Step 1: version the application</h2>
+
+        <div class="key-concept">
+            <b>tl;dr:</b> <a href="https://github.com/toolongautomated/tutorial-1/tree/2-application-versioning">git tag
+                with a solution</a>
+        </div>
+
+
+        <p>
+            Recap: we’ll use git tags and docker image tags to keep our application versioned. Let’s start with the tags
+            as it’s easy to do.
+        </p>
+
+        <p>
+            But first things first.
+        </p>
+
+        <p>
+            We need a file that will be used to log all the changes introduced to our app. The file will be called…
+        </p>
+
+        <p>
+            🥁🥁🥁
+        </p>
+
+        <p>
+            💥 CHANGELOG.md 💥
+        </p>
+
+        <p>
+            I’m a big fan of <a href="https://semver.org/">semantic versioning
+                scheme</a>. Sounds mysterious, but I bet I bet you’ve already seen
+            this approach in action multiple times:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+&lt;MAJOR&gt;.&lt;MINOR&gt;.&lt;PATCH&gt; # e.g. "1.4.2"
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            What are these “major”, “minor”, and “patch”? Here’s an excerpt from
+            the <a href="https://semver.org/#summary">docs</a>:
+        </p>
+
+        <ol class="article-list">
+            <li><b>MAJOR</b> version when you make incompatible API changes</li>
+            <li><b>MINOR</b> version when you add functionality in a backward
+                compatible manner</li>
+            <li><b>PATCH</b> version when you make backward compatible bug fixes</li>
+        </ol>
+
+        <p>
+            That’s the approach we’re going to follow in our change log.
+        </p>
+
+        <p>
+            Now the important thing: when should you update the version of the
+            application and introduce new entry in the change log?
+        </p>
+
+        <p>
+            <b>Whenever you add/remove/change any file strictly related to the
+                application.</b>
+        </p>
+
+        <p>
+            This can be: source code, requirements, static files that are used
+            by the application from within the container, this sort of things.
+            It may be a bit hard to grasp in the beginning, but you’ll quickly
+            learn to judge properly, I promise. Plus, that’s why there are other
+            developers that will be reviewing your code to help build these
+            intuitions 🙌🏼
+        </p>
+
+        <h3 id="git-tagging">git tagging</h3>
+
+        <p>
+            As mentioned before, you can think of <a href="https://git-scm.com/book/en/v2/Git-Basics-Tagging">git
+                tags</a> as “named commits” – you can reference a specific point in
+            repository’s git history using a human-friendly string, not commit’s
+            SHA. At this point of implementation, we’re going to just define the
+            rules for creating new git tags, not to automate it in any way.
+            We’ll start with the following rule:
+        </p>
+
+        <div class="key-concept">
+            🚨 <b>Rule:</b> whenever new version is put in the change log file
+            and gets merged into the main branch, a corresponding git tag should
+            be created.
+        </div>
+
+        <p>
+            To make it crystal clear: you decide that the app will have version
+            1.0.1 because there was one small backward-compatible bug that you
+            fixed. What you should do:
+        </p>
+
+        <ol class="article-list">
+            <li>Create new feature branch from the main branch.</li>
+            <li>Fix the bug in the application and put new entry in the
+                CHANGELOG.md file, briefly describing the change.</li>
+            <li>Open PR to the main branch.</li>
+            <li>Once approved, merge the code.</li>
+            <li>Checkout main locally and pull the changes.</li>
+            <li>Create a tag with the following command:
+                <pre style="margin: 0.5rem 0;"><code class="language-bash">git tag 1.0.1</code></pre>
+            </li>
+            <li>Push the tag to the remote:
+                <pre style="margin: 0.5rem 0;"><code class="language-bash">git push --tags</code></pre>
+            </li>
+        </ol>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/F-w6vZjFNXwAAAAd/tenor.gif" alt="Voila" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a
+                    href="https://tenor.com/pl/view/voila-lex-luthor-gene-hackman-superman-the-movie-behold-gif-1723817343362348412">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <h3 id="containerize-the-application">Containerize the application</h3>
+
+        <p>
+            Now is the perfect time to containerize our application. How?
+        </p>
+
+        <ul class="article-list">
+            <li>wrap your app with <a href="https://www.docker.com/">Docker</a>
+                into a docker image</li>
+            <li>build the image locally with a minimal, yet functional set of
+                files required by the app to run properly
+            </li>
+            <li><b>[optional]</b> set up a docker image registry on Docker
+                Hub</li>
+            <li>push the image to the registry</li>
+        </ul>
+
+        <p>
+            To make app containerization as straightforward as possible, it is useful to first organize it into “a
+            container-friendly” structure:
+        </p>
+
+        <pre>
+            <code class="language-plaintext">
+app/
+├── src/
+├── test/
+│   ├── integration/
+│   └── unit/
+├── CHANGELOG.md
+├── requirements-test.txt
+└── requirements.txt
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            I think it’s pretty self-explanatory, so let’s continue.
+        </p>
+
+        <p>
+            We’ll add two files to this mix under the app directory: Dockerfile
+            and .dockerignore. Since our application is a super simple Flask
+            server, Dockerfile will be rather straightforward:
+        </p>
+
+        <pre>
+            <code class="language-dockerfile">
+FROM python:3.10-slim
+
+EXPOSE 80
+ENV FLASK_APP=main.py
+
+COPY . /app
+WORKDIR /app/src
+
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:80", "main:app"]
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            And the corresponding .dockerignore (to ensure only the files that
+            are essential for the server to run properly inside a container are
+            copied to the image during the build procedure):
+        </p>
+
+        <pre>
+            <code class="language-plaintext">
+**/__pycache__/
+.pytest_cache/
+
+test/
+
+requirements-test.txt
+*.md
+
+.dockerignore
+Dockerfile
+            </code>
+        </pre>
+
+
+        <br>
+        <p>
+            Note that test requirements are NOT put into the app container as
+            they’re not needed there for the app to run correctly. If required,
+            you may of course create a separate Dockerfile that would set up the
+            container for testing purposes. I can imagine at least several use
+            cases that would benefit from doing it, e.g. automating unit and/or
+            integration tests execution and running them as Docker containers.
+        </p>
+
+
+        <p>
+            Once added Docker-related files, app’s directory should now look
+            like this:
+        </p>
+
+        <pre>
+            <code class="language-plaintext">
+app/
+├── src/
+├── test/
+│   ├── integration/
+│   └── unit/
+├── .dockerignore
+├── CHANGELOG.md
+├── Dockerfile
+├── requirements-test.txt
+└── requirements.txt
+            </code>
+        </pre>
+
+        <p>
+            Believe me or not, but this will be enough to build Docker image
+            with our application and publish it to the docker image registry.
+        </p>
+
+        <p>
+            Run the following to build a docker image locally:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app
+docker build -t tutorial-1 .
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            The image will be called tutorial-1. To run it, use the following
+            command:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+docker run --rm -p 80:80 tutorial-1
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            Note that the directory from which you are running the container is
+            NOT important in this case. Docker container runs a Flask server
+            inside, exposed to port 80 of the container. To make it available
+            runs a Flask server inside, exposed to port 80 of the container. To
+            make it available <b>outside of the container</b>, we need to
+            forward this port to some other port outside of the container.
+            That's what the -p flag does – it forwards container's port number
+            80 to port 80 of the local machine.
+        </p>
+
+        <p>
+            Once built, the image can be <b>pushed to an external registry</b>
+            (a place on the Internet where your Docker images are stored). For
+            this tutorial, I've prepared a helper <a href="https://hub.docker.com/r/toolongautomated/tutorial-1">Docker
+                Hub repository</a>. It’s <i>public</i>, meaning, you can <b>pull</b>
+            the images from it without any limitations, however…
+        </p>
+
+        <div class="key-concept">
+            <b>🚨 Disclaimer:</b> if you’d like to push your own docker images
+            somewhere, you’ll need to set up your own Docker container
+            registry. You can read more about setting up a Docker Hub repository
+            <a href="https://docs.docker.com/docker-hub/repos/">here</a>.
+        </div>
+
+
+        <p>
+            Okay, back to the gist.
+        </p>
+
+        <p>
+            Where were we… ah, yes, building and pushing Docker images.
+        </p>
+
+        <p>
+            To push the image, you need to first <b>authenticate</b> to your
+            image registry of choice. In my case it's the Docker Hub, so I
+            simply need to run:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+docker login
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            Next, let's <b>adjust the tags</b> of the image we've already built
+            before (tutorial-1):
+        </p>
+
+        <pre>
+            <code class="language-bash">
+docker tag tutorial-1 toolongautomated/tutorial-1:1.0.0
+            </code>
+        </pre>
+
+        <br>
+        <p>
+            Then, to <b>push</b> the built image:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+docker push toolongautomated/tutorial-1:1.0.0
+            </code>
+        </pre>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/9MJFqpA5HP8AAAAd/tenor.gif" alt="Ship it" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center;">
+                Source: <a
+                    href="https://tenor.com/pl/view/launch-of-the-uss-detroit-nonononoyes-launching-gif-5357378">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <div class="content-separator"></div>
+
+        <p>
+            This concludes step 1 of our implementation efforts. We now have a
+            clear git tagging process defined, and the app is containerized. I
+            encourage you to spend some time with <a
+                href="https://github.com/toolongautomated/tutorial-1/tree/2-application-versioning">the
+                code</a> and read the README until you get comfortable with what you
+            see there.
+        </p>
+
+        <p>
+            Next on the agenda, final piece of the baseline requirements:
+            configuration of multiple deployment targets. We'll talk about it in
+            the next article.
+        </p>
+
+        <p>
+            I hope you enjoyed this article and learned something new. If you
+            have any thoughts or suggestions, please feel free to reach out to
+            me either via <a href="mailto:toolongautomated@gmail.com">email</a>
+            or via <a href="https://x.com/bmiselis">X</a>.
+        </p>
+
+        <p>
+            See you in the next one! 👋🏼
+        </p>
+
+        <div class="article-navigation">
+            <div class="nav-buttons">
+                <a href="one-branch-to-rule-them-all-1.html" class="nav-button prev-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all | guided series #1</div>
+                        </div>
+                        <img src="2/image.png" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>too long; automated</h3>
+                <p class="footer-description">Exploring digital world to automate it and enjoy life. Written by Bartosz
+                    Miselis</p>
+                <br>
+                <a href="mailto:toolongautomated@gmail.com">toolongautomated@gmail.com</a>
+            </div>
+            <div class="footer-column">
+                <div class="footer-social">
+                    <div class="social-item">
+                        <img src="../../assets/github.svg" alt="GitHub" class="social-icon">
+                        <a href="https://github.com/toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/x.svg" alt="X" class="social-icon">
+                        <a href="https://x.com/bmiselis" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/linkedin.svg" alt="LinkedIn" class="social-icon">
+                        <a href="https://www.linkedin.com/in/bmiselis/" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/youtube.svg" alt="YouTube" class="social-icon">
+                        <a href="https://www.youtube.com/@toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="zoom-overlay" class="zoom-overlay">
+        <img id="zoomed-img" class="zoomed-image" alt="Zoomed Image">
+    </div>
+    <script src="../../scripts/theme.js"></script>
+    <script src="../../scripts/zoomable.js"></script>
+    <script src="../../scripts/interactions.js"></script>
+    <script src="../../highlight/highlight.min.js"></script>
+    <script src="../../scripts/progressbar.js"></script>
+
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>
