@@ -1,42 +1,41 @@
 // Theme handling
-const themeToggles = document.querySelectorAll('.theme-toggle');
 const root = document.documentElement;
+const toggle = document.querySelector('.tdnn');
+const moon = document.querySelector('.moon');
 
-// Check for saved theme or system preference
-const savedTheme = localStorage.getItem('theme') || 'system';
-setTheme(savedTheme);
+// Check system preference
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-// Theme toggle listeners
-themeToggles.forEach(button => {
-    button.addEventListener('click', () => {
-        const theme = button.dataset.theme;
-        setTheme(theme);
-        localStorage.setItem('theme', theme);
-    });
-});
-
-// Theme setting function
-function setTheme(theme) {
-    themeToggles.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === theme);
-    });
-
-    let effectiveTheme = theme;
-    if (theme === 'system') {
-        effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    root.setAttribute('data-theme', effectiveTheme);
-
-    // Handle highlight.js themes
-    document.querySelectorAll('.theme-specific').forEach(stylesheet => {
-        stylesheet.disabled = stylesheet.getAttribute('data-theme') !== effectiveTheme;
-    });
+// Set initial state based on system preference
+if (prefersDark) {
+    root.setAttribute('data-theme', 'dark');
+    toggle.classList.remove('day');
+    moon.classList.remove('sun');
+} else {
+    root.setAttribute('data-theme', 'light');
+    toggle.classList.add('day');
+    moon.classList.add('sun');
 }
 
+// Theme toggle listener
+toggle.addEventListener('click', () => {
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    root.setAttribute('data-theme', newTheme);
+    toggle.classList.toggle('day');
+    moon.classList.toggle('sun');
+
+    // Store preference
+    localStorage.setItem('theme', newTheme);
+});
+
 // Listen for system theme changes
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (localStorage.getItem('theme') === 'system') {
-        setTheme('system');
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        root.setAttribute('data-theme', newTheme);
+        toggle.classList.toggle('day', !e.matches);
+        moon.classList.toggle('sun', !e.matches);
     }
 });
