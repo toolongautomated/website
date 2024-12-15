@@ -68,10 +68,15 @@
     padding: 0.1rem 0.3rem;
 }
 
-.article-image {
+.article-image,
+.article-card picture {
     width: 150px;
     height: 150px;
-    object-fit: cover;
+}
+
+.article-card picture img {
+    width: 100%;
+    height: 100%;
     outline: 1px solid var(--border-color);
     border: 4px solid var(--bg-color);
 }
@@ -278,6 +283,10 @@ pre code span {
 
 .nav-title {
     font-weight: bold;
+    background: none;
+}
+
+.nav-title span {
     background: none;
 }
 
