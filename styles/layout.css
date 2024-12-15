@@ -170,8 +170,7 @@ footer::before {
 
 .latest-post-container {
     position: relative;
-    margin-top: 4rem;
-    margin-bottom: 3rem;
+    margin-top: 3rem;
     z-index: 2;
 }
 
