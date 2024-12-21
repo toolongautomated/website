@@ -6,6 +6,7 @@
     --key-concept-bg: #f8f8f8;
     --popup-overlay: rgba(255, 255, 255, 0.85);
     --shadow-color: #000;
+    --transparent-image-hoverable-bg-color: #fff;
 }
 
 [data-theme="dark"] {
@@ -16,6 +17,7 @@
     --key-concept-bg: #222;
     --popup-overlay: rgba(40, 40, 40, 0.85);
     --shadow-color: #000;
+    --transparent-image-hoverable-bg-color: #353535;
 }
 
 * {
@@ -113,5 +115,9 @@ p a {
 }
 
 li a {
+    border-bottom: 1px dotted var(--text-color);
+}
+
+figcaption a {
     border-bottom: 1px dotted var(--text-color);
 }

@@ -137,6 +137,19 @@ pre code span {
     width: 100%;
     height: auto;
     display: block;
+    background: none;
+}
+
+.article-internal-image div a {
+    display: block;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.article-internal-image a:hover {
+    transition: background-color 0.2s;
+    background-color: var(--hover-bg);
 }
 
 .article-internal-image figcaption {

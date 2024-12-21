@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoughts on OpenAI o3 model | too long; automated</title>
+    <link rel="icon" type="image/png" href="../../assets/logo-dark.png">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/light-theme.css">
+    <link rel="stylesheet" href="../../styles/dark-theme.css">
+    <link rel="stylesheet" href="../../styles/mobile.css">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-light.min.css" class="theme-specific"
+        data-theme="light">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-dark.min.css" class="theme-specific"
+        data-theme="dark">
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <img src="../../assets/logo-dark.png" class="logo-image">
+            <div class="title-group">
+                <span class="site-title">too long; automated</span>
+                <div class="tdnn">
+                    <div class="moon"></div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" style="border-bottom: none;">home</a></li>
+                <li><a href="../../archive.html" style="border-bottom: none;">archive</a></li>
+                <li><a href="../../about.html" style="border-bottom: none;">about</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <figure class="article-internal-image">
+            <img src="6/image-wide.webp" alt="OpenAI o3 model">
+        </figure>
+
+        <h1>Thoughts on OpenAI o3 model</h1>
+
+        <p class="article-subtitle">
+            On December 20th, OpenAI released o3 – second generation reasoning model. Here's why I think you should care
+            about it.
+        </p>
+
+        <div class="article-meta">December 13, 2024</div>
+
+        <div class="key-concept">
+            o3's improvement over the GPT series proves that architecture is
+            everything. You couldn't throw more compute at GPT-4 and get these
+            results. Simply scaling up the things we were doing from 2019 to
+            2023 – take the same architecture, train a bigger version on more
+            data – is not enough. Further progress is about new ideas.
+            <br>
+            <br>
+            ~ François Chollet [<a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">source</a>]
+        </div>
+
+        <p>
+            This post is based on two resources:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                <a href="https://www.youtube.com/live/SKBG1sqdyIU?si=rZo4hRE_BGs7r2Ec">original video announcement from
+                    OpenAI</a>
+            </li>
+            <li>
+                <a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">François Chollet's blog post on o3's score
+                    on the ARC-AGI benchmark</a>
+            </li>
+        </ul>
+
+        <p>
+            Chollet's blog post is the most interesting insight I found that
+            shines new light onto the evaluation of the o3 model on the
+            important general intelligence benchmark called ARC-AGI. Chollet
+            made it a little bit technical, so I'll try to extract the essence
+            of it into a more comprehensible form.
+        </p>
+
+        <h2>tl;dr</h2>
+
+        <p>
+            New o3 model from OpenAI is a breakthrough improvement over other
+            models evaluated in the ARC-AGI benchmark (set of tasks the AI model
+            has to solve in order to prove it has general intelligence). o3 is
+            able to adapt to tasks it has never seen, and does so on nearly
+            human-level.
+        </p>
+
+        <p>
+            Here are its results, compared with the other models.
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="6/o-series-performance.jpg" alt="o3 model results" class="zoomable"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center; padding: 0.5rem;">
+                o3 model results.
+                <br>
+                Source: <a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC-AGI</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            A bunch of explanations:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                <b>ARC-AGI semi-private eval</b> - a set of 100 tasks the model
+                is requested to solve. Here, 76% score of o3 low (tuned) means
+                that it successfully solved 76 of these tasks.
+            </li>
+            <li>
+                <b>y axis</b> shows the score a given model achieved on the ARC-AGI
+                benchmark
+            </li>
+            <li>
+                <b>x axis</b> shows how much, on average, it cost to solve the
+                task by the model (counted as the compute/API cost).
+            </li>
+            <li>
+                <b>"KAGGLE SOTA"</b> - the best model on the <a
+                    href="https://www.kaggle.com/competitions/arc-prize-2024/leaderboard">ARC
+                    Prize 2024 Kaggle competition</a>
+            </li>
+            <li>
+                <b>"AVG. MTURKER"</b> - average score of the human from <a href="https://www.mturk.com/">Amazon
+                    Mechanical Turk</a>'s
+                service evaluated on the ARC-AGI benchmark
+            </li>
+            <li>
+                <b>"STEM GRAD"</b> - score the graduate student from the STEM
+                field get on the benchmark
+            </li>
+            <li id="footnote-ref-1">
+                <b>"LOW/MED/HIGH" next to "o1" and "o3" scores</b> - how hard
+                the model is allowed to reason<sup><a href="#footnote-1">1</a></sup> about the task it is presented
+                with. This directly corresponds to
+                the <a
+                    href="https://platform.openai.com/docs/api-reference/chat/create#chat-create-reasoning_effort">reasoning_effort
+                    parameter</a> from the OpenAI's API.
+            </li>
+            <li>
+                <b>"TUNED" (next to o3 scores)</b> - this is to denote that the o3 system has been trained on the
+                ARC-AGI-1 Public Training set. Since it has some knowledge about the ARC-AGI data before the evaluation,
+                it's considered to be tuned to the task.
+            </li>
+        </ul>
+
+        <div class="content-separator"></div>
+
+        <p>
+            I believe that even though o3 itself will not replace programmers, scientists, mathematicians, and others
+            working in the STEM field, it definitely highlights the trend in the industry.
+        </p>
+
+        <p>
+            It seems we're entering the phase in which there will exist strong models that will achieve human, or maybe
+            even superhuman performance on very specific tasks (like coding).
+        </p>
+
+        <p>
+            Is it good or maybe bad?
+        </p>
+
+        <p>
+            It is what it is, to be honest. What is important is to stay on top of all of that.
+        </p>
+
+        <p>
+            Are you afraid?
+        </p>
+
+        <p>
+            I am. But I don't want to let this fear and uncertainty paralyze me. What helps me in such situations is to
+            better understand what I'm dealing with. That often shows that my fear is caused by misunderstanding the
+            situation, not by the situation itself.
+        </p>
+
+        <p>
+            Let's understand the o3 then, even just a little bit of what it is and what it does.
+        </p>
+
+        <h2>What is o3?</h2>
+
+        <p>
+            Models like GPT struggle with tasks they haven't seen in the
+            training data because they lack true reasoning abilities. Their
+            answers are generated using the same amount of compute, no matter
+            how complex the problem they're solving is. This doesn't make sense,
+            at least not in the way we understand true intelligence and what it
+            takes to solve the problems. This "one-size-fits-all" approach works
+            well for familiar tasks but sparks issues when faced with something
+            genuinely new, as it prevents GPTs from adapting to the unknowns.
+        </p>
+
+        <p>
+            Reasoning, on the other hand, involves breaking down a problem into
+            smaller, manageable steps and exploring different solution paths.
+            This is often called a <i>chain of thought</i> (CoT), where each
+            step logically follows from the previous one, leading to a solution.
+            GPTs were tricked to work this way by prompts like "think about it
+            step by step", maybe you are familiar with this technique. It worked
+            well, but had its limitations.
+        </p>
+
+        <p>
+            o1 before, and now o3 represent a breakthrough because they leverage
+            this reasoning process by design. Unlike GPT, o3 dynamically
+            generates and evaluates different solution paths (chains of thought)
+            to find the best approach for a given task, guided by the internal
+            "evaluator model", probably in a way DeepMind's <a
+                href="https://deepmind.google/discover/blog/alphazero-shedding-new-light-on-chess-shogi-and-go/">AlphaZero</a>
+            does its Monte Carlo tree search. This ability to adapt its
+            computational effort based on the problem's complexity, a core
+            feature of o3, is a significant shift from the fixed computation of
+            previous models, moving AI closer to more human-like reasoning.
+        </p>
+
+        <p>
+            Is o3 AGI? Chollet doesn't think so (and neither do I):
+        </p>
+
+        <div class="key-concept">
+            Passing ARC-AGI does not equate to achieving AGI, and, as a matter
+            of fact, I don't think o3 is AGI yet. o3 still fails on some very
+            easy tasks, indicating fundamental differences with human
+            intelligence.
+            <br>
+            <br>
+            ~ François Chollet [<a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">source</a>]
+        </div>
+
+        <h2>What is ARC-AGI and why is it important?</h2>
+
+        <div class="key-concept">
+            Most AI benchmarks measure skill. But skill is not intelligence.
+            General intelligence is the ability to efficiently acquire new
+            skills. Chollet's unbeaten 2019 Abstraction and Reasoning Corpus for
+            Artificial General Intelligence (<a href="https://arcprize.org/">ARC-AGI</a>) is the only formal
+            benchmark of AGI progress. <br><br> It's easy for humans, but hard
+            for AI. <br><br> ~ François Chollet [<a href="https://arcprize.org/blog/oai-o3-pub-breakthrough">source</a>]
+        </div>
+
+        <p>
+            You can read more about it <a href="https://arcprize.org/">here</a>,
+            including <b>trying some of the challenges yourself</b>! I highly
+            encourage you to do this! I bet you'll quickly understand that these
+            are quite tricky, but still relatively easy for humans to grasp
+            intuitively.
+        </p>
+
+        <p>
+            This benchmark is one of a few that still haven't <i>saturated</i>,
+            meaning that there's still space for improvement.
+        </p>
+
+        <h2>ARC-AGI challenges o3 can NOT solve, can you?</h2>
+
+        <figure class="article-internal-image">
+            <img src="6/example-task-1.png" alt="ARC-AGI Task ID: c6e1b8da">
+            <figcaption>ARC-AGI Task ID: c6e1b8da<br>Source: <a
+                    href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC-AGI</a></figcaption>
+        </figure>
+
+        <figure class="article-internal-image">
+            <img src="6/example-task-2.png" alt="ARC-AGI Task ID: 0d87d2a6">
+            <figcaption>ARC-AGI Task ID: 0d87d2a6<br>Source: <a
+                    href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC-AGI</a></figcaption>
+        </figure>
+
+        <figure class="article-internal-image">
+            <img src="6/example-task-3.png" alt="ARC-AGI Task ID: b457fec5">
+            <figcaption>ARC-AGI Task ID: b457fec5<br>Source: <a
+                    href="https://arcprize.org/blog/oai-o3-pub-breakthrough">ARC-AGI</a></figcaption>
+        </figure>
+
+        <p>
+            We're definitely living in the interesting times. I'm waiting with a
+            bated breath for the next big thing. It's scary, but it's also
+            fascinating.
+        </p>
+
+        <div class="footnotes">
+            <h2>Footnotes</h2>
+            <ol style="list-style-type: none;">
+                <li id="footnote-1"><a href="#footnote-ref-1">↪ 1</a> "The o1 models introduce reasoning tokens. The
+                    models use these reasoning tokens to "think", breaking down their understanding of the prompt and
+                    considering multiple approaches to generating a response. After generating reasoning tokens, the
+                    model produces an answer as visible completion tokens, and discards the reasoning tokens from its
+                    context." Read more about it <a
+                        href="https://platform.openai.com/docs/guides/reasoning#how-reasoning-works">here</a>.</li>
+            </ol>
+        </div>
+
+        <div class="article-navigation">
+            <div class="nav-buttons">
+                <a href="one-branch-to-rule-them-all-2.html" class="nav-button prev-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #2</span></div>
+                        </div>
+                        <img src="3/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>too long; automated</h3>
+                <p class="footer-description">Exploring digital world to automate it and enjoy life. <span
+                        style="white-space: nowrap;">Written by Bartosz
+                        Miselis</span>
+                </p>
+                <br>
+                <a href="mailto:toolongautomated@gmail.com">toolongautomated@gmail.com</a>
+            </div>
+            <div class="footer-column">
+                <div class="footer-social">
+                    <div class="social-item">
+                        <img src="../../assets/github.svg" alt="GitHub" class="social-icon">
+                        <a href="https://github.com/toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/x.svg" alt="X" class="social-icon">
+                        <a href="https://x.com/bmiselis" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/linkedin.svg" alt="LinkedIn" class="social-icon">
+                        <a href="https://www.linkedin.com/in/bmiselis/" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/youtube.svg" alt="YouTube" class="social-icon">
+                        <a href="https://www.youtube.com/@toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="zoom-overlay" class="zoom-overlay">
+        <img id="zoomed-img" class="zoomed-image">
+    </div>
+    <script src="../../scripts/theme.js"></script>
+    <script src="../../scripts/zoomable.js"></script>
+    <script src="../../scripts/interactions.js"></script>
+    <script src="../../highlight/highlight.min.js"></script>
+    <script src="../../scripts/progressbar.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>
