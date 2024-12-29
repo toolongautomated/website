@@ -72,4 +72,10 @@
     .nav-button {
         max-width: none;
     }
+
+    .zoomable {
+        cursor: default;
+        transition: none;
+        pointer-events: none;
+    }
 }
