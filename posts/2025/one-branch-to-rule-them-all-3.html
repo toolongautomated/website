@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>one branch to rule them all | guided series #2</title>
+    <link rel="icon" type="image/png" href="../../assets/logo-dark.png">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/light-theme.css">
+    <link rel="stylesheet" href="../../styles/dark-theme.css">
+    <link rel="stylesheet" href="../../styles/mobile.css">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-light.min.css" class="theme-specific"
+        data-theme="light">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-dark.min.css" class="theme-specific"
+        data-theme="dark">
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <img src="../../assets/logo-dark.png" class="logo-image">
+            <div class="title-group">
+                <span class="site-title">too long; automated</span>
+                <div class="tdnn">
+                    <div class="moon"></div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" style="border-bottom: none;">home</a></li>
+                <li><a href="../../archive.html" style="border-bottom: none;">archive</a></li>
+                <li><a href="../../about.html" style="border-bottom: none;">about</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <figure class="article-internal-image">
+            <img src="1/image-wide.webp" alt="Descriptive alt text">
+        </figure>
+
+        <h1>one branch to rule them all <span style="white-space: nowrap;">| guided series #3</span></h1>
+
+        <p class="article-subtitle">
+            Last time, we set up versioning and containerization of our app.
+            Now, it's time to implement and configure deployment targets so that
+            we will have both staging and production environments available.
+        </p>
+
+        <div class="article-meta">January 13, 2025</div>
+
+        <div class="content-separator"></div>
+
+
+        <p>
+            Hey, good to have you here today.
+        </p>
+
+        <p>
+            <b>tl;dr:</b> My goal for this short series is very simple: <b>teach
+                you by example</b>. Together, we’re going through the full process I
+            follow to solve various problems:
+        </p>
+
+        <ul class="article-list" style="list-style: none;">
+            <li>🔍 <b>gather and understand requirements</b></li>
+            <li>🧠 <b>brainstorm solutions</b></li>
+            <li>🎯 <b>scope</b></li>
+            <li>👨🏻‍💻 <b>implement & test</b> (iterate until convergence)</li>
+            <li>🛑 <b>stop</b> (sounds easy? :p)</li>
+        </ul>
+
+        <p>
+            What are we working on in this series?
+        </p>
+
+        <div class="key-concept">
+            <b>🤔 PROBLEM DEFINITION</b>
+
+            How to deploy an app to multiple environments so that each env can
+            run a different version of the application?
+        </div>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Last time, we scoped the problem and selected solutions for every
+            requirement. We've also (finally!) started the implementation. At this point,
+            our application is versioned in two useful ways:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                git tags
+            </li>
+            <li>
+                Docker image tags
+            </li>
+        </ul>
+
+        <p>
+            Sounds interesting, but you haven't read it yet? No worries, here it is:
+        </p>
+
+        <div class="article-navigation" style="margin: 2rem 0;">
+            <div class="nav-buttons">
+                <a href="../2024/one-branch-to-rule-them-all-2.html" class="nav-button prev-article"
+                    style="max-width: 100%;">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #2</span></div>
+                        </div>
+                        <img src="../2024/3/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <p>
+            If all you need is code, you can check out the checkpoint from the
+            previous post <a
+                href="https://github.com/toolongautomated/tutorial-1/tree/2-application-versioning">here</a>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Today, we're going to focus on the <b>deployment targets</b>. We'll
+            cover the following topics:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                .env vs. YAML file formats
+            </li>
+            <li>
+                Google Cloud Platform's Cloud Run 101
+            </li>
+            <li>
+                wrapping the deployment using a shell script
+            </li>
+            <li>
+                how to use all of this in practice with git
+            </li>
+        </ul>
+
+
+        <div class="table-of-contents">
+            <div class="toc-title">table of contents</div>
+            <pre>
+<span class="ascii">.</span>
+<span class="ascii">├── </span>👨🏻‍💻 <a href="#implement-test">Implement & test</a>
+│   <span class="ascii">│</span>
+│   <span class="ascii">└── </span><a href="#step-2-configure-deployment-targets">Step 2: configure deployment targets</a>
+│   <span class="ascii">    │</span>
+│   <span class="ascii">    ├── </span><a href="#file-format">File format</a>
+│   <span class="ascii">    ├── </span><a href="#configure-gcloud-cli">Configure gcloud CLI</a>
+│   <span class="ascii">    ├── </span><a href="#deploy-to-cloud-run">Deploy to Cloud Run</a>
+│   <span class="ascii">    ├── </span><a href="#wrap-deployment-with-bash">Wrap deployment with bash</a>
+│   <span class="ascii">    └── </span><a href="#how-to-use-in-practice-with-git">How to use this in practice with git</a>
+│
+<span class="ascii">└── </span>🛑 <a href="#stop?">Stop?</a>
+            </pre>
+        </div>
+
+        <div class="content-separator"></div>
+
+        <h1 id="implement-test">👨🏻‍💻 Implement & test</h1>
+
+        <p>
+            Since the first step of the implementation is already done, we can
+            start with the second one.
+        </p>
+
+        <h2 id="step-2-configure-deployment-targets">Step 2: configure deployment targets</h2>
+
+        <p>
+            This step is the final chapter of the <i>versioned app
+                deployment</i> story (not an epilogue, though), in which I will show
+            you how to use simple .env files to configure staging and production
+            environments separately.
+        </p>
+
+        <h3 id="file-format">File format</h3>
+
+        <div class="key-concept">
+            <b>tl;dr:</b> <a href="https://github.com/toolongautomated/tutorial-1/tree/3-environment-configuration">git
+                tag with a solution</a>
+        </div>
+
+        <p>
+            I’m fully aware that there are many different formats and standards
+            that can be used to manage configuration of the applications and
+            deployments.
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="https://imgs.xkcd.com/comics/standards_2x.png" alt="Proliferation of standards" class="zoomable"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center; padding: 1rem;">
+                Proliferation of standards (also configuration ones).
+                <br>
+                Source: <a href="https://xkcd.com/927/">xkcd.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            For this tutorial, I hesitated slightly between .env and YAML.
+        </p>
+
+        <p>
+            <b>.env</b> is extremely simple. It contains the information in the
+            following format:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+# .env
+
+ENVIRONMENT=production
+PORT=12345
+DOCKER_IMAGE=toolongautomated/tutorial-1:1.0.0
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            As you can see, it just stores shell variables, one in every row. It
+            doesn’t have any sections, nested structure, none.
+        </p>
+
+        <p>
+            <b>YAML</b> can do what .env does + much, much more. We will briefly
+            mention basic structure, but if you’d like to read about all that is
+            available, go and dive into raw <a href="https://yaml.org/spec/1.2.2/">specification</a> of this
+            language.
+        </p>
+
+        <p>
+            The above .env example would look very similar when written in the YAML
+            format:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+# config.yaml
+
+environment: production
+port: 12345
+docker_image: toolongautomated/tutorial-1:1.0.0
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            What is nice about it is that it can add structure by e.g. nesting
+            levels:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+# config.yaml
+
+environment: production
+port: 12345
+
+docker:
+  image: toolongautomated/tutorial-1
+  tag: 1.0.0
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            This is definitely easier to read. Not only that, though. Such
+            structure allows for separation between various applications
+            configured via single env-specific file:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+# config.yaml
+
+app1:
+  environment: production
+  port: 12345
+  docker:
+    image: toolongautomated/tutorial-1
+    tag: 1.0.0
+
+app2:
+  environment: production
+  port: 3333
+  docker:
+    image: toolongautomated/tutorial-2
+    tag: 0.4.0
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Basic .env file wouldn’t allow to do that without using e.g. long
+            prefixes:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+# .env
+...
+APP2_DOCKER_TAG=0.4.0
+...
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Don’t get me wrong, it’s still completely fine, but some may find it
+            harder to grasp in the first look. Let’s look at the YAML example
+            converted to .env:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+# .env
+
+# APP1
+APP1_ENVIRONMENT=production
+APP1_PORT=12345
+APP1_DOCKER_IMAGE=toolongautomated/tutorial-1
+APP1_DOCKER_TAG=1.0.0
+
+# APP2
+APP2_ENVIRONMENT=production
+APP2_PORT=3333
+APP2_DOCKER_IMAGE=toolongautomated/tutorial-2
+APP2_DOCKER_TAG=0.4.0
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            It’s not that bad!
+        </p>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/sVUg-nFdn0kAAAAd/tenor.gif" alt="Not bad" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a
+                    href="https://tenor.com/pl/view/the-rock-dwayne-johnson-dwayne-the-rock-johnson-not-bad-reaction-gif-27340252">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            You know what, for our mini-project, let’s proceed with .env.
+        </p>
+
+        <div class="key-concept">
+            It’s extremely <b>simple</b>, yet <b>versatile</b> enough for our use
+            case.
+        </div>
+
+        <p>
+            Moreover, this tutorial is not about complex logic, but rather about
+            general patterns that I consider good practices. Using YAML would
+            complicate our flow a bit as it’d require installing <a href="https://github.com/mikefarah/yq">additional
+                dependency
+                (yq)</a> to parse YAML from CLI and learning its syntax first. I
+            don’t want us to focus on that here, so nope. However, in the
+            project you’re building, I totally recommend doing it with YAML. It
+            won’t be hard to switch from what you’ll see below from .env to YAML
+            🙌🏼
+        </p>
+
+        <p>
+            <i>Okay buddy, where do I put these .env files?</i>
+        </p>
+
+        <pre>
+            <code class="language-plaintext">
+app/
+docs/
+deploy/
+├── environments/
+│   ├── staging/
+│   │   └── .env 👈🏼 here
+│   └── production/
+│       └── .env 👈🏼 and here
+.gitignore
+LICENSE
+README.md
+requirements-test.txt
+requirements.txt
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            If you need more environments than staging and production, simply
+            create a dedicated subdirectory in the deploy/environments
+            directory.
+        </p>
+
+        <p>
+            Now, we know where to put the files, but what to put inside them and
+            <b>HOW TO USE THEM TO DEPLOY?</b> Glad you asked.
+        </p>
+
+        <div class="article-internal-gif">
+            <img src="https://c.tenor.com/xoGozR8sVA4AAAAd/tenor.gif" alt="Glad you asked"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a href="https://tenor.com/pl/view/rubbing-hands-together-we-bear-gif-21574731">tenor.com</a>
+            </figcaption>
+        </div>
+
+        <p>
+            Here is a summary what we’ve got so far:
+        </p>
+
+        <ul class="article-list">
+            <li>✅ application container tagged with a version and pushed to Docker Hub registry</li>
+            <li>✅ env-specific configuration files</li>
+            <li>❌ deployment platform</li>
+            <li>❌ deployment commands/scripts</li>
+        </ul>
+
+        <p>
+            Next, let’s start with the <b>deployment platform</b>. I think that
+            giving you a chance to play with something real (cloud) instead of a
+            local playground (your machine) will be invaluable. I’ve analyzed <a
+                href="https://cloud.google.com/free/docs/free-cloud-features">free
+                tier rules</a> of the Google Cloud Platform and realized that <b>Cloud
+                Run</b> will be a perfect choice to play with multi-environment
+            deployment tutorial. It is because for our short experiments, <b>it’ll
+                be free to use</b><sup><a href="#footnote-1" class="footnote-ref" id="footnote-ref-1">1</a></sup>.
+        </p>
+
+        <p>
+            If you’d like this tutorial to be a true hands-on experience, I
+            highly encourage you to set up a GCP project and play with it in
+            the rest of this tutorial. I’ve prepared a short video on how to
+            create a new project if this is your first time doing it:
+        </p>
+
+        <figure class="article-internal-image">
+            <div style="background: var(--transparent-image-hoverable-bg-color);">
+                <a href="https://youtu.be/pC2dBysvhwI" target="_blank">
+                    <img src="1/youtube-thumbnail.png" alt="YouTube tutorial" style="width: 100%; height: auto;">
+                </a>
+            </div>
+        </figure>
+
+        <p>
+            If you prefer to read, here’s the official docs for you: <a
+                href="https://developers.google.com/workspace/guides/create-project">link</a>.
+        </p>
+
+        <div class="key-concept">
+            <b>🚨Important:</b> Note that using GCP may incur some costs if you
+            do anything outside of the <a href="https://cloud.google.com/free/docs/free-cloud-features">free
+                tier</a>. My rule of thumb is that if I have any doubt whether
+            something will cost some money or not, I try to search for the
+            answer online. If I can’t find a reasonable explanation, I simply
+            <b>avoid using the feature</b>. Unless I’m okay paying, then don’t
+            worry about the research 😅
+        </div>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Okay, so Cloud Run it is. What is Cloud Run?
+        </p>
+
+        <div class="key-concept">
+            <b>tl;dr:</b> Cloud Run lets you run your app in containers without
+            worrying about servers. It scales up and down as needed and only
+            costs when it’s running. It’s great for small services and APIs.
+        </div>
+
+        <p>
+            <i>Let’s you run app in containers</i> – that’s exactly what we
+            need! Let me show you how to deploy our Flask server as a Cloud Run
+            service.
+        </p>
+
+        <h3 id="configure-gcloud-cli">Configure gcloud CLI</h3>
+
+        <p>
+            We’re programmers, so we’re not using any UI to configure stuff, are
+            we? 🥲
+        </p>
+
+        <p>
+            Google provides a dedicated CLI tool to manipulate GCP infrastructure
+            from a local machine. It’s called <b>gcloud</b> and here are the
+            <a href="https://cloud.google.com/sdk/docs/install">instructions</a>
+            on how to install it.
+        </p>
+
+        <p>
+            Once installed, you need to authorize gcloud:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud auth login
+gcloud auth application-default login
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Then, we need to set the GCP project that all gcloud commands will
+            run against:
+
+        <pre>
+            <code class="language-bash">
+gcloud config set project [YOUR PROJECT ID]
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Finally, the quota project needs to also be set to this project ID:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud auth application-default set-quota-project [YOUR PROJECT ID]
+            </code>
+        </pre>
+
+        <div class="article-internal-gif">
+            <img src="https://c.tenor.com/QprUq7VLPLQAAAAd/tenor.gif" alt="Exhausted cat"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a
+                    href="https://tenor.com/pl/view/sad-cat-sunakook-tired-exhausted-gif-4799382186862787764">tenor.com</a>
+            </figcaption>
+        </div>
+
+        <p>
+            With gcloud set, we’re good to deploy.
+        </p>
+
+        <h3 id="deploy-to-cloud-run">Deploy to Cloud Run</h3>
+
+        <p>
+            Deploying a Docker image to Cloud Run is extremely simple:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud run deploy tla-tutorial-1-staging \
+  --image docker.io/toolongautomated/tutorial-1:1.0.0 \
+  --port 80 \
+  --region us-central1 \
+  --allow-unauthenticated
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Here is a full documentation of this command: <a
+                href="https://cloud.google.com/run/docs/deploying#gcloud">link</a>.
+        </p>
+
+        <ul class="article-list">
+            <li>
+                <i>tla-tutorial-1-staging</i> is the name of the service that will be deployed
+            </li>
+            <li>
+                <i>image</i> is the Docker image that will be deployed. Cloud Run
+                supports GCP’s Artifact Registry and Docker
+                Hub
+                out of the box.
+            </li>
+            <li>
+                <i>port</i> is the port number in the container to which the requests will be forwarded
+            </li>
+            <li>
+                <i>region</i> is the GCP region in which the service will be running
+            </li>
+            <li>
+                <i>allow-unauthenticated</i> flag is used with public APIs and
+                websites so that everyone on the Internet can access the service
+            </li>
+        </ul>
+
+        This command takes a minute or two. You can check its result in the Cloud Run section the GCP cloud console:
+
+        <figure class="article-internal-image">
+            <img src="1/cloud-run-search.webp" alt="Search for the service" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Search for Cloud Run in the search bar at the top of GCP cloud console.
+            </figcaption>
+        </figure>
+
+        <figure class="article-internal-image">
+            <img src="1/cloud-run-deployed.webp" alt="Deployed service" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Once successfully deployed, the service will be visible in Cloud Run section.
+            </figcaption>
+        </figure>
+
+        <p>
+            It is possible to get the public URL for the service you’ve just deployed:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud run services list
+            </code>
+        </pre>
+
+        <br>
+
+        <figure class="article-internal-image">
+            <img src="1/cloud-run-public-url-cli.webp" alt="Public URL" style="width: 100%; height: auto;">
+        </figure>
+
+        <br>
+
+        <p>
+            Visit this URL and check whether you see the following screen:
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="1/flask-welcome-page.webp" alt="Flask welcome page" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Welcome page of our simple Flask server when deployed to Cloud Run.
+            </figcaption>
+        </figure>
+
+        <p>
+            Once you’re satisfied with your deployment, let’s delete it:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud run services delete tla-tutorial-1-staging \
+    --region us-central1
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            That’s basically it – we deployed a containerized application to
+            Cloud Run 🚀
+        </p>
+
+        <h3 id="wrap-deployment-with-bash">Wrap deployment with bash</h3>
+
+        <div class="key-concept">
+            <b>tl;dr:</b> <a href="https://github.com/toolongautomated/tutorial-1/tree/4-deployment">git tag with a
+                solution</a>
+        </div>
+
+        <p>
+            gcloud commands above are rather straightforward, I know. They may
+            even be straightforward enough to not do anything more with them.
+            But I’d like to show you a flow leveraging bash scripting that will
+            let you run your app in an arbitrary deployment environment
+            effortlessly. However, to delete a service, we’ll still use gcloud
+            command instead of the bash wrapper. My take on deletion is that it
+            often needs to be done carefully, and hence I’m very reluctant to
+            automate such actions.
+        </p>
+
+        <p>
+            There are several parameters we need to provide to Cloud Run so that
+            it can create a working service from our Docker image. Let’s put
+            these to our .env files:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+# deploy/environments/staging/.env
+
+ENVIRONMENT=staging
+SERVICE_NAME=tla-tutorial-1
+DOCKER_IMAGE=toolongautomated/tutorial-1:1.0.0
+REGION=us-central1
+PORT=80
+            </code>
+        </pre>
+
+        <br>
+
+        <pre>
+            <code class="language-bash">
+# deploy/environments/production/.env
+
+ENVIRONMENT=production
+SERVICE_NAME=tla-tutorial-1
+DOCKER_IMAGE=toolongautomated/tutorial-1:1.0.0
+REGION=us-central1
+PORT=80
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Both staging and production will be running the same version of the
+            application, with the same configuration. The only difference will
+            be env. As Cloud Run doesn’t natively support environments or
+            namespaces, I’m going to simulate this behavior by adding a suffix
+            to the service name that will indicate in which “environment” the
+            service is running.
+        </p>
+
+        <p>
+            We need a way to parameterize gcloud deployment command so that the
+            values from a user-selected .env file will be used. For this, I’ve
+            created the following bash script:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+#!/bin/bash
+
+function help() {
+    echo "Usage:"
+    echo "  deploy: ./manage.bash deploy [ENVIRONMENT]"
+    echo ""
+    echo "Example usage:"
+    echo "  Deploy a service: ./manage.bash deploy staging"
+}
+
+function load_env() {
+    local env_file="deploy/environments/$1/.env"
+    if [ ! -f "$env_file" ]; then
+        echo "Error: Environment file not found: $env_file"
+        exit 1
+    fi
+
+    # Export variables from the .env file into the current shell
+    set -a
+    source "$env_file"
+    set +a
+}
+
+# Main script execution starts here
+case "$1" in
+"deploy")
+    # Check if environment parameter is provided
+    if [ -z "$2" ]; then
+        echo "Error: Environment not specified"
+        help_deploy
+        exit 1
+    fi
+
+    environment="$2"
+
+    # Load environment-specific variables
+    load_env "$environment"
+
+    # Deploy to Cloud Run using loaded variables
+    echo "Deploying service $SERVICE_NAME-$ENVIRONMENT to region $REGION..."
+    gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
+        --image $DOCKER_IMAGE \
+        --port $PORT \
+        --region $REGION \
+        --allow-unauthenticated
+
+    ;;
+"help")
+    # Display general help message
+    help
+    exit 0
+    ;;
+*)
+    # Display help for unknown commands
+    echo "Error: Unknown command $1"
+    help
+    exit 1
+    ;;
+esac
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            You can use this script as follows:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage deploy [ENVIRONMENT]
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            For instance:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage deploy staging
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Note that [ENVIRONMENT] needs to strictly match the name of the
+            env-specific subdirectory in the <i>deploy/environments</i> path.
+        </p>
+
+        <p>
+            In case of passing <i>staging</i> as the environment value, all the
+            values from the deploy/environments/staging/.env are used to
+            populate the values in the templated gcloud command:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
+    --image $DOCKER_IMAGE \
+    --port $PORT \
+    --region $REGION \
+    --allow-unauthenticated
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Note that resulting service name will be formed by concatenating
+            $SERVICE_NAME and $ENVIRONMENT, yielding names like
+            <i>tla-tutorial-1-staging</i> or <i>tla-tutorial-1-production</i>.
+        </p>
+
+        <p>
+            If you were ever to remove/add new environment, you can just
+            remove/add new subdirectory and .env file in the deploy/environments
+            directory.
+        </p>
+
+        <div class="article-internal-gif">
+            <img src="https://c.tenor.com/UtaXwhW5zv0AAAAd/tenor.gif" alt="That's it?!"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a
+                    href="https://tenor.com/pl/view/thats-it-max-park-dont-make-me-go-thats-all-you-have-thats-all-gif-25895560">tenor.com</a>
+            </figcaption>
+        </div>
+
+        <p>
+            Yeah, that’s it. Nobody said it’s gonna be hard!
+        </p>
+
+        <p>
+            Whenever your apps require additional options for deployment, you
+            can simply modify the bash script (called <i>manage</i> in this
+            tutorial) and adjust it to your needs – it’s flexible enough to
+            handle many, many use cases.
+        </p>
+
+        <h3 id="how-to-use-in-practice-with-git">How to use this in practice with git</h3>
+
+        <p>
+            We got the configuration files in place, and a script that is used
+            to deploy the apps to the platform of choice (Cloud Run in this
+            tutorial). The final question to be answered is the following:
+        </p>
+
+        <div class="key-concept">
+            When should I run the deployment script?
+        </div>
+
+        <p>
+            <b>Whenever you introduce changes to the configuration file.</b>
+        </p>
+
+        <p>
+            Remember, we only have the main branch that lives forever. Then,
+            there are short-lived feature branches. No develop branches, no
+            release branches. Basically, nothing that would indicate that
+            whenever we merge code to somewhere, the deployments should be
+            updated.
+        </p>
+
+        <p>
+            To update the deployment (or make a new one):
+        </p>
+
+        <ol class="article-list">
+            <li>
+                Open a feature branch from main.
+            </li>
+            <li>
+                Make changes to selected .env files or create a new one.
+            </li>
+            <li>
+                Merge the changes to main.
+            </li>
+            <li>
+                Checkout to main locally, pull latest changes, and run the
+                deployment command for all the environments whose configuration
+                files were updated/created.
+            </li>
+            <li>
+                If the environment should no longer exist, remove it manually
+                after the merge.
+            </li>
+        </ol>
+
+        <p>
+            That’s how you do it 🙌🏼
+        </p>
+
+        <h1 id="stop?">🛑 Stop?</h1>
+
+
+        <div class="article-internal-gif">
+            <img src="https://c.tenor.com/D2BOzsv2ckIAAAAd/tenor.gif" alt="Nope" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                If you’re from <a
+                    href="https://www.peacecorps.gov/connect/blog/yes-or-no-depends-on-which-country-youre-in/#:~:text=Then%20I%20remember%3A%20A%20shake,lead%20to%20so%20much%20confusion."
+                    target="_blank">Bulgaria</a>, that means <b>no</b>.
+                <br>
+                Source: <a href="https://tenor.com/pl/view/no-donkeys-shrek-gif-1107972158425297474">tenor.com</a>
+            </figcaption>
+        </div>
+
+        <p>
+            Did you really think we’re going to stop here, buddy? I hope not!
+        </p>
+
+        <p>
+            In next part of the <i>One branch to rule them all</i> series, we
+            will <b>AUTOMATE 🤟🏼</b> After all, who likes to manually:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                tag your repository
+            </li>
+            <li>
+                build Docker images
+            </li>
+            <li>
+                run unit and integration tests
+            </li>
+            <li>
+                deploy the application
+            </li>
+        </ul>
+
+        <p>
+            Stay tuned and see you in the next one!
+        </p>
+
+        <p>
+            I hope you enjoyed this article and learned something new. If you
+            have any thoughts or suggestions, please feel free to reach out to
+            me either via <a href="mailto:toolongautomated@gmail.com">email</a>
+            or via <a href="https://x.com/bmiselis">X</a>.
+        </p>
+
+        <div class="footnotes">
+            <h2>Footnotes</h2>
+            <ol style="list-style-type: none;">
+                <li id="footnote-1"><a href="#footnote-ref-1">↪ 1</a> True as of January 13th 2025</li>
+            </ol>
+        </div>
+
+        <div class="article-navigation">
+            <div class="nav-buttons">
+                <a href="../2024/thoughts-on-openai-o3.html" class="nav-button prev-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">Thoughts on OpenAI o3 model</div>
+                        </div>
+                        <img src="../2024/6/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>too long; automated</h3>
+                <p class="footer-description">Exploring digital world to automate it and enjoy life. <span
+                        style="white-space: nowrap;">Written by Bartosz
+                        Miselis</span>
+                </p>
+                <br>
+                <a href="mailto:toolongautomated@gmail.com">toolongautomated@gmail.com</a>
+            </div>
+            <div class="footer-column">
+                <div class="footer-social">
+                    <div class="social-item">
+                        <img src="../../assets/github.svg" alt="GitHub" class="social-icon">
+                        <a href="https://github.com/toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/x.svg" alt="X" class="social-icon">
+                        <a href="https://x.com/bmiselis" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/linkedin.svg" alt="LinkedIn" class="social-icon">
+                        <a href="https://www.linkedin.com/in/bmiselis/" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/youtube.svg" alt="YouTube" class="social-icon">
+                        <a href="https://www.youtube.com/@toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="zoom-overlay" class="zoom-overlay">
+        <img id="zoomed-img" class="zoomed-image" alt="Zoomed Image">
+    </div>
+    <script src="../../scripts/theme.js"></script>
+    <script src="../../scripts/zoomable.js"></script>
+    <script src="../../scripts/interactions.js"></script>
+    <script src="../../highlight/highlight.min.js"></script>
+    <script src="../../scripts/progressbar.js"></script>
+
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>
