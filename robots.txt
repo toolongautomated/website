@@ -1,0 +1,11 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Block Simple Analytics paths (optional but good practice)
+Disallow: /simple-analytics
+Disallow: /sa
+Disallow: /latest.js
+
+# Sitemap
+Sitemap: https://toolongautomated.com/sitemap.xml
