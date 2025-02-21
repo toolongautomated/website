@@ -3,10 +3,15 @@ const root = document.documentElement;
 const toggle = document.querySelector('.tdnn');
 const moon = document.querySelector('.moon');
 
-// Function to update theme-specific stylesheets
+// Function to update theme-specific stylesheets and images
 const updateThemeStylesheets = (theme) => {
-    document.querySelectorAll('.theme-specific').forEach(stylesheet => {
-        stylesheet.disabled = stylesheet.dataset.theme !== theme;
+    // Handle stylesheets
+    document.querySelectorAll('.theme-specific').forEach(element => {
+        if (element.tagName === 'LINK') {
+            element.disabled = element.dataset.theme !== theme;
+        } else if (element.tagName === 'IMG') {
+            element.style.display = element.dataset.theme === theme ? 'block' : 'none';
+        }
     });
 };
 

@@ -78,4 +78,18 @@
         transition: none;
         pointer-events: none;
     }
+
+    .article-table-wrapper {
+        position: relative;
+    }
+
+    .article-table-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .article-table-wrapper .article-table {
+        min-width: 1000px;
+    }
 }

@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>one branch to rule them all | guided series #4</title>
+    <link rel="icon" type="image/png" href="../../assets/logo-dark.png">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/light-theme.css">
+    <link rel="stylesheet" href="../../styles/dark-theme.css">
+    <link rel="stylesheet" href="../../styles/mobile.css">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-light.min.css" class="theme-specific"
+        data-theme="light">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-dark.min.css" class="theme-specific"
+        data-theme="dark">
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <img src="../../assets/logo-dark.png" class="logo-image">
+            <div class="title-group">
+                <span class="site-title">too long; automated</span>
+                <div class="tdnn">
+                    <div class="moon"></div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" style="border-bottom: none;">home</a></li>
+                <li><a href="../../archive.html" style="border-bottom: none;">archive</a></li>
+                <li><a href="../../about.html" style="border-bottom: none;">about</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <figure class="article-internal-image">
+            <img src="2/image-wide.webp" alt="Descriptive alt text">
+        </figure>
+
+        <h1>one branch to rule them all <span style="white-space: nowrap;">| guided series #4</span></h1>
+
+        <p class="article-subtitle">
+            Join me for the final part of the <i>One branch to rule them all</i> guided series! We'll implement a
+            full-fledged CI/CD pipeline, with automated tests, git tagging, Docker image building and pushing, and a
+            deployment to Cloud Run.
+        </p>
+
+        <div class="article-meta">February 21, 2025</div>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Hello and welcome to the final part of the <i>One branch to rule them all</i> guided series!
+        </p>
+
+        <p>
+            <b>spoiler:</b> the automated workflows we'll implement today are a full-fledged CI/CD pipeline. If you've
+            ever wondered how to introduce continuous integration and delivery into your projects, today is
+            the day!
+        </p>
+
+        <table class="article-table">
+            <tr>
+                <th>action</th>
+                <th>before</th>
+                <th>after tl;a</th>
+            </tr>
+            <tr>
+                <td>run unit tests</td>
+                <td>🚫 none</td>
+                <td>✅ automated</td>
+            </tr>
+            <tr>
+                <td>create git tags</td>
+                <td>❌ manual</td>
+                <td>✅ automated</td>
+            </tr>
+            <tr>
+                <td>build and push Docker images</td>
+                <td>❌ manual</td>
+                <td>✅ automated</td>
+            </tr>
+            <tr>
+                <td>run integration tests</td>
+                <td>🚫 none</td>
+                <td>✅ automated</td>
+            </tr>
+            <tr>
+                <td>deploy to Cloud Run</td>
+                <td>❌ manual</td>
+                <td>✅ automated</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <p>
+            <b>tl;dr:</b> My goal for this short series is very simple: <b>teach you by example</b>. Together, we're
+            going through the full process I follow to solve various problems:
+        </p>
+
+        <ul class="article-list" style="list-style: none;">
+            <li>🔍 <b>gather and understand requirements</b></li>
+            <li>🧠 <b>brainstorm solutions</b></li>
+            <li>🎯 <b>scope</b></li>
+            <li>👨🏻‍💻 <b>implement & test</b> (iterate until convergence)</li>
+            <li>🛑 <b>stop</b> (sounds easy? :p)</li>
+        </ul>
+
+        <p>
+            What are we working on in this series?
+        </p>
+
+        <div class="key-concept">
+            <b>🤔 PROBLEM DEFINITION</b>
+
+            How to deploy an app to multiple environments so that each env can run a different version of the
+            application?
+        </div>
+
+        <p>
+            You can access the code for what we've covered so far on <a
+                href="https://github.com/toolongautomated/tutorial-1/tree/4-deployment">GitHub</a>.
+        </p>
+
+        <div class="table-of-contents">
+            <div class="toc-title">table of contents</div>
+            <pre>
+<span class="ascii">.</span>
+<span class="ascii">├── </span>👨🏻‍💻 <a href="#test">Test</a>
+│   <span class="ascii">├── </span><a href="#unit-tests">Unit tests</a>
+│   <span class="ascii">└── </span><a href="#integration-tests">Integration tests</a>
+│
+<span class="ascii">├── </span>🚀 <a href="#github-actions-workflows">GitHub Actions workflows</a>
+│   <span class="ascii">├── </span><a href="#authorize-github-actions-workflows">Authorize Github Actions workflows to manage Google Cloud resources</a>
+│   │   <span class="ascii">├── </span><a href="#workload-identity-pool">Workload identity pool</a>
+│   │   <span class="ascii">├── </span><a href="#workload-identity-pool-provider">Workload identity pool provider</a>
+│   │   <span class="ascii">├── </span><a href="#custom-iam-role">Custom IAM role</a>
+│   │   <span class="ascii">├── </span><a href="#iam-policy-binding">IAM policy binding</a>
+│   │   <span class="ascii">└── </span><a href="#manage-setup-iam-command">Bonus: wrap into manage setup-iam command</a>
+│   <span class="ascii">├── </span><a href="#git-tags--docker-image-build--push">git tags + Docker image build & push</a>
+│   <span class="ascii">├── </span><a href="#deploy-to-cloud-run">Deploy to Cloud Run</a>
+│   <span class="ascii">├── </span><a href="#run-unit-tests">Run unit tests</a>
+│   <span class="ascii">└── </span><a href="#run-integration-tests">Run integration tests</a>
+│
+<span class="ascii">├── </span>🛑 <a href="#stop">Stop</a>
+│
+<span class="ascii">└── </span>🏁 <a href="#conclusion">Conclusion</a>
+            </pre>
+        </div>
+
+        <h2>Recap</h2>
+
+        <p>
+            In the last post, the focus was on configuring multiple deployment targets to control which application
+            version runs in staging and production environments. We ended up with a simple directory structure:
+        </p>
+
+        <pre>
+            <code class="language-plaintext">
+app/
+docs/
+deploy/
+└── environments/
+    ├── staging/
+    │   └── .env 👈🏼 here
+    └── production/
+        └── .env 👈🏼 and here
+            </code>
+        </pre>
+
+        <br>
+
+        <ul class="article-list">
+            <li><code>deploy/environments</code> directory contains subdirectories dedicated to deployment targets</li>
+            <li><code>.env</code> files are used for env-specific configuration</li>
+        </ul>
+
+        <div class="article-navigation" style="margin: 2rem 0;">
+            <div class="nav-buttons">
+                <a href="../2025/one-branch-to-rule-them-all-3.html" class="nav-button prev-article"
+                    style="max-width: 100%;">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #3</span></div>
+                        </div>
+                        <img src="../2025/1/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <p>
+            I promised that next time we will automate several processes that currently need to be done manually:
+        </p>
+
+        <ul class="article-list">
+            <li>git tags creation</li>
+            <li>Docker image building and pushing</li>
+            <li>unit and integration tests execution</li>
+            <li>application deployment</li>
+        </ul>
+
+        <p>
+            Without further due, let's begin!
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h2 id="test">👨🏻‍💻 Test</h2>
+
+        <p>
+            So far, the test suite of our mini-project was rather pathetic. No integration tests, and a single (!) unit
+            test — which, to make matters worse, was just a smoke test. Time to change that a little.
+        </p>
+
+        <p>
+            I want us to have a bunch of realistic unit and integration tests:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                <b>unit</b> tests to check if internal app functions return correct outputs given certain inputs
+            </li>
+            <li>
+                <b>integration</b> tests to check whether a real application deployment returns expected responses and
+                status codes given certain requests
+            </li>
+        </ul>
+
+        <p>
+            To dive deeper into the testing topic, read more about <a
+                href="https://martinfowler.com/bliki/UnitTest.html">unit tests</a>, <a
+                href="https://martinfowler.com/bliki/IntegrationTest.html">integration tests</a>, and the <a
+                href="https://martinfowler.com/bliki/TestPyramid.html">test pyramid</a>.
+        </p>
+
+        <h3 id="unit-tests">Unit tests</h3>
+
+        <p>
+            Let's introduce two helper functions:
+        </p>
+
+        <pre>
+            <code class="language-python">
+def dummy_helper_function(arg1: str, arg2: int) -> str:
+    if not args_valid(arg1, arg2):
+        raise ValueError("Invalid arguments")
+    return arg2 * arg1
+
+
+def args_valid(arg1: str, arg2: int) -> bool:
+    if arg1 is None or arg2 is None:
+        return False
+    elif not isinstance(arg1, str):
+        return False
+    elif not isinstance(arg2, int) or isinstance(arg2, bool):
+        return False
+
+    return True
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            They aren't useful in any terms – their only purpose of existence is to be tested.
+        </p>
+
+        <p>
+            There are three scenarios to be tested:
+        </p>
+
+        <ul class="article-list">
+            <li>
+                <code>dummy_helper_function()</code>
+                <ul style="margin-left: 2em;">
+                    <li>given valid input produces expected output</li>
+                    <li>given invalid input raises an exception</li>
+                </ul>
+            </li>
+            <li>
+                <code>args_valid()</code>
+                <ul style="margin-left: 2em;">
+                    <li>given valid input produces expected output</li>
+                </ul>
+            </li>
+        </ul>
+
+        <p>
+            To reuse test logic for various parameter combinations, we'll use <code>@pytest.mark.parametrize</code>
+            decorator. I highly recommend using it to reduce the volume of your tests. If it's the first time you hear
+            about it, you can learn more about it in <a
+                href="https://docs.pytest.org/en/stable/example/parametrize.html">pytest docs</a>.
+        </p>
+
+        <p>
+            Here's a <code>test_helpers.py</code> file with all the aforementioned tests: <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/5-automations/app/test/unit/test_helpers.py">link</a>.
+        </p>
+
+        <p>
+            To run the tests, install the requirements:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app
+pip install -r requirements-test.txt
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Then, run the unit tests:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app/
+export PYTHONPATH=${PYTHONPATH}:$(pwd)
+pytest test/unit -v
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            It's important to update <code>PYTHONPATH</code>, otherwise pytest will not be able to import
+            <code>src/helpers.py</code> correctly.
+        </p>
+
+        <h3 id="integration-tests">Integration tests</h3>
+
+        <p>
+            Integration tests check whether a real application deployment returns expected responses and status codes
+            given certain requests. Unfortunately, the only thing our app does is it displays "Welcome to the too long;
+            automated app!" text once the user enters the <code>/</code> route. I like minimalism, but this is too
+            minimalist to showcase something useful.
+        </p>
+
+        <p>
+            Let's create a new endpoint that will return the name of the planet in our solar system given its position:
+        </p>
+
+        <pre>
+            <code class="language-python">
+from flask import jsonify, request
+
+PLANETS = {
+    1: "Mercury",
+    2: "Venus",
+    3: "Earth",
+    4: "Mars",
+    5: "Jupiter",
+    6: "Saturn",
+    7: "Uranus",
+    8: "Neptune",
+}
+
+
+@app.route("/planet")
+def get_planet():
+    try:
+        position = int(request.args.get("position", 0))
+        if position < 1:
+            return jsonify({"error": "Position must be greater than 0"}), 400
+
+        if position in PLANETS:
+            return jsonify({"planet": PLANETS[position]}), 200
+
+        return jsonify({"error": f"No planet exists at position {position}"}), 404
+
+    except ValueError:
+        return jsonify({"error": "Position must be a valid integer"}), 400
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            As you can see, it also performs some internal validation. It's great for our integration test suite as it
+            enables checking both returned data and response's status code.
+        </p>
+
+        <p>
+            There are four scenarios that we will test. As a quick exercise, try to understand them by peeking at their
+            definition in the <code>@pytest.mark.parameterize</code> decorator in the code snippet below:
+        </p>
+
+        <pre>
+            <code class="language-python">
+import os
+import pytest
+import requests
+
+ENDPOINT_URL = os.environ.get("ENDPOINT_URL")
+if not ENDPOINT_URL:
+    raise ValueError("ENDPOINT_URL environment variable must be set")
+
+
+@pytest.mark.parametrize(
+    "position, expected_status, expected_response",
+    [
+        (3, 200, {"planet": "Earth"}),
+        (9, 404, {"error": "No planet exists at position 9"}),
+        (-1, 400, {"error": "Position must be greater than 0"}),
+        ("not_a_number", 400, {"error": "Position must be a valid integer"}),
+    ],
+)
+def test_planet_endpoint(position, expected_status, expected_response):
+    response = requests.get(f"{ENDPOINT_URL}/planet", params={"position": position})
+    assert response.status_code == expected_status
+    data = response.json()
+
+    for key, value in expected_response.items():
+        assert key in data
+        assert value in data[key] if "error" in key else data[key] == value
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Note that <code>test_planet_endpoint</code> test makes real requests, not mock ones. This is a key
+            difference from the unit tests as it requires an application to a) be running and b) be accessible by the
+            integration tests under the <code>ENDPOINT_URL</code> path.
+        </p>
+
+        <p>
+            To run the tests, install the requirements:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app/
+pip install -r requirements-test.txt
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Then, run the application:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app/src
+export FLASK_APP=main.py
+gunicorn -w 4 -b 0.0.0.0:80 main:app
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Finally, in a separate terminal tab/window:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+cd app/
+export ENDPOINT_URL=http://localhost:80
+pytest test/integration -v
+            </code>
+        </pre>
+
+        <figure class="article-internal-image">
+            <img src="2/integration-tests-planet-endpoint.png" alt="Integration tests planet endpoint"
+                style="width: 100%; height: auto;">
+        </figure>
+
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/0xakd3Yk-TkAAAAd/tenor.gif" alt="I'm done" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a href="https://tenor.com/pl/view/m2-gif-15210525624480627001">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <div class="content-separator"></div>
+
+        <h2 id="github-actions-workflows">🚀 GitHub Actions workflows</h2>
+
+        <p>
+            Now that all the pieces of our project are in place, let's talk about CI/CD.
+        </p>
+
+        <p>
+            During active project development, new features/fixes need to be integrated into the main branch on a
+            regular basis. We're working in a <a
+                href="https://www.toolongautomated.com/posts/2024/one-branch-to-rule-them-all-1.html#option-2-permissive-trunk-based-development">permissive
+                trunk-based development</a> setup, so merges will happen frequently (at least several times a week). It
+            means a lot of manual tagging, building and pushing Docker images, running unit tests, running integration
+            tests. <b>That's a lot to do, and a lot to remember, huh?</b>
+        </p>
+
+        <p>
+            One thing I truly enjoy about reliable automations is that it frees up your memory – you no longer need to
+            remember all those things that must be done once certain conditions are met, thus the <b>probability of an
+                error caused by omissions reduces significantly</b>.
+        </p>
+
+        <p>
+            That's why we need Continuous Integration (CI part of the CI/CD term). Continuous Delivery (CD part of the
+            CI/CD term) is about frequent, automated deployments of new app versions to production environments. In our
+            case, CD means deploying to Cloud Run on a regular basis.
+        </p>
+
+        <p>
+            Let's see what we need:
+        </p>
+
+        <div class="article-table-wrapper">
+            <div class="article-table-scroll">
+                <table class="article-table">
+                    <tr>
+                        <th>Action</th>
+                        <th>Trigger</th>
+                        <th>Effects</th>
+                        <th>Required permissions</th>
+                    </tr>
+                    <tr>
+                        <td><a href="#run-unit-tests">unit tests</a></td>
+                        <td>pull request opened or new commits added to it (only if it contains changes that affect unit
+                            test
+                            results)</td>
+                        <td>▪ new comment in pull request with the test results<br>▪ if fails, PR gets blocked and
+                            merging
+                            can't be
+                            done</td>
+                        <td>▪ update PR checks<br>▪ create & modify PR comments</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#git-tags--docker-image-build--push">git tags</a></td>
+                        <td>modified application code is pushed into main branch</td>
+                        <td>git tag created</td>
+                        <td>create git tags</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#git-tags--docker-image-build--push">building and pushing Docker images</a></td>
+                        <td>new application tag released</td>
+                        <td>Docker image built and pushed to Docker Hub</td>
+                        <td>push images to Docker Hub</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#run-integration-tests">integration tests</a></td>
+                        <td>pull request opened or new commits added to it (only if it contains changes to .env files in
+                            the
+                            deploy/environments directory)</td>
+                        <td>▪ temporary deployment of a new app version to test environment that will be used to run the
+                            integration tests<br>▪ new comment in pull request with the test results<br>▪ if fails, PR
+                            gets
+                            blocked
+                            and
+                            merging can't be done</td>
+                        <td>▪ update PR checks<br>▪ create & modify PR comments<br>▪ create and delete Cloud Run
+                            deployments</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#deploy-to-cloud-run">Cloud Run deployment</a></td>
+                        <td>modified .env file is pushed into main branch</td>
+                        <td>deployment updated</td>
+                        <td>create & modify Cloud Run deployments</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <p>
+            I know it is a lot of information to digest, so take as much time as you need to soak it in. Once you're
+            ready, jump back in.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <p>
+            We will use this table as a recipe to create automated workflows in GitHub Actions:
+        </p>
+
+        <div class="key-concept">
+            When <b>[TRIGGER],</b> run Github Actions workflow that will execute <b>[ACTION]</b> and produce
+            <b>[EFFECTS]</b>. Grant <b>[REQUIRED PERMISSIONS]</b> or it will fail.
+        </div>
+
+        <p>
+            Makes sense?
+        </p>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/yjfrm2I4ZqgAAAAd/tenor.gif" alt="Makes sense"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a href="https://tenor.com/pl/view/mm-aha-shocked-gif-14571374171980850856">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            If you look carefully at the table, you will notice that executing integration tests and updating Cloud Run
+            deployments <b>require permissions to create, modify, or delete Cloud Run deployments</b>.
+        </p>
+
+        <p>
+            Modifying cloud resources directly from GitHub Actions workflow is very convenient, but may also pose a
+            security risk to your cloud environment.
+        </p>
+
+        <p>
+            Why is that? Let me explain.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h3 id="authorize-github-actions-workflows">🔑 Authorize Github Actions workflows to manage Google Cloud
+            resources securely using Workload Identity Federation</h3>
+
+        <p>
+            Traditional solution to authorizing CI/CD workflows to modify cloud environments is by using service
+            accounts.
+        </p>
+
+        <p>
+            <b>Don't do it, I'm begging you 🙏🏼</b>
+        </p>
+
+        <div class="key-concept">
+            Traditionally, authenticating from GitHub Actions to Google Cloud required exporting and storing a
+            long-lived JSON service account key, <b>turning an identity management problem into a secrets management
+                problem</b>. Not only did this introduce additional security risks if the service account key were to
+            leak, but it also meant developers would be unable to authenticate from GitHub Actions to Google Cloud if
+            their organization has disabled service account key creation (a common security best practice) via
+            organization policy constraints like constraints/iam.disableServiceAccountKeyCreation.*
+            <br><br>
+            source: <a
+                href="https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions">Google
+                Cloud blog</a>
+        </div>
+
+        <p>
+            GitHub was well aware of that. In 2021, they introduced support for OpenID Connect (OIDC) to enable secure
+            cloud deployments using short-lived tokens. It leverages security mechanisms of cloud providers to ensure
+            GitHub Actions workflows get <b>very narrow access</b> to cloud resources. Plus, there's <b>no need for
+                storing any long-lived secrets like service account keys</b> in GitHub.
+        </p>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/Vr9P0tRw8QIAAAAd/tenor.gif" alt="wow" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a href="https://tenor.com/pl/view/look-holy-moly-omg-whoa-gif-22960590">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            GItHub's support for OIDC made it compatible with the Google Cloud's mechanism called <b>Workload Identity
+                Federation</b>.
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="2/github-gcp-wif.jpg" alt="GitHub <> GCP Workload Identity Federation"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a
+                    href="https://storage.googleapis.com/gweb-cloudblog-publish/images/2_GitHub_Actions.max-1100x1100.jpg">storage.googleapis.com</a>
+            </figcaption>
+        </figure>
+
+        <p>
+            With Workload Identity Federation, Identity and Access Management (IAM) can be used to grant external
+            identities (like GitHub repositories/users/branches) IAM roles, and thus direct access to Google cloud
+            resources. It is also possible to let these external identities <a
+                href="https://cloud.google.com/iam/docs/service-account-impersonation">impersonate service accounts</a>.
+            You can read more about the integration between GitHub and Google Cloud in <a
+                href="https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions">this
+                blog post</a>.
+        </p>
+
+        <p>
+            For a full list of services that are supported by Workload Identity Federation, check out <a
+                href="https://cloud.google.com/iam/docs/federated-identity-supported-services?utm_source=chatgpt.com">this
+                resource</a>. Some of the services have more or less severe limitations, so keep that in mind when
+            considering this authorization approach.
+        </p>
+
+        <p>
+            In this project, we need to grant permission to GitHub Actions workflow to <b>create/modify/delete Cloud Run
+                deployments</b>. It's fully supported by Workload Identity Federation, so nothing to worry about!
+        </p>
+
+        <p>
+            In order to make Workload Identity Federation work properly, we will need to set up the following pieces:
+        </p>
+
+        <ul class="article-list">
+            <li><b>workload identity pool</b> (to manage GitHub identities)</li>
+            <li><b>workload identity pool provider</b> (to describe a relationship between Google Cloud and GitHub)</li>
+            <li><b>custom IAM role</b> (to grant GitHub Actions workflow strictly permissions it requires, but nothing
+                more)</li>
+            <li><b>IAM policy binding</b> (to bind GitHub identity to the aforementioned role)</li>
+        </ul>
+
+        <p>
+            We're going to use gcloud CLI to do that, so <a
+                href="https://www.toolongautomated.com/posts/2025/one-branch-to-rule-them-all-3.html#configure-gcloud-cli">ensure
+                you have it configured on your local machine</a> before proceeding.
+        </p>
+
+        <h4 id="workload-identity-pool">Workload identity pool</h4>
+
+        <p>
+            Workload identity pool will let us manage external identities, e.g. GitHub identities like repository owner,
+            repository, user, or branch. To create a workload identity pool called "github", run the command below:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+PROJECT_ID="toolongautomated"
+POOL_NAME="github"
+POOL_DISPLAY_NAME="Github Actions Pool"
+
+gcloud iam workload-identity-pools create $POOL_NAME \
+    --project=$PROJECT_ID \
+    --location="global" \
+    --display-name=$POOL_DISPLAY_NAME \
+    --format="value(name)"
+            </code>
+        </pre>
+
+        <h4 id="workload-identity-pool-provider">Workload identity pool provider</h4>
+
+        <p>
+            Workload identity pool <b>provider</b> will make it possible to describe a relationship between Google Cloud
+            and GitHub. To create a workload identity pool provider called "toolongautomated", run the command below:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+# Update these variables to reflect your project.
+PROJECT_ID="toolongautomated"
+REPO_OWNER="toolongautomated"
+POOL_NAME="github"
+PROVIDER_NAME="toolongautomated"
+PROVIDER_DISPLAY_NAME="Github Actions identity provider"
+
+gcloud iam workload-identity-pools providers create-oidc $PROVIDER_NAME \
+    --project=$PROJECT_ID \
+    --location="global" \
+    --workload-identity-pool=$POOL_NAME \
+    --display-name=$PROVIDER_DISPLAY_NAME \
+    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+    --attribute-condition="assertion.repository_owner == '$REPO_OWNER'" \
+    --issuer-uri="https://token.actions.githubusercontent.com"
+            </code>
+        </pre>
+
+        <h4 id="custom-iam-role">Custom IAM role</h4>
+
+        <p>
+            In order to manage Cloud Run deployments, there are several permissions the entity needs to be granted
+            beforehands. Let's define the role in a YAML and save it to a file
+            <code>infrastructure/cloud_run_deployer_role.yaml</code>:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+title: cloud_run_deployer
+description: Cloud Run Deployer Role
+stage: GA
+includedPermissions:
+  - run.services.create
+  - run.services.delete
+  - run.services.update
+  - run.services.get
+  - run.services.setIamPolicy
+  - run.services.getIamPolicy
+  - run.operations.get
+  - artifactregistry.repositories.downloadArtifacts
+  - iam.serviceAccounts.actAs
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Then, the following command can be run to create the role in Google Cloud:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+PROJECT_ID="toolongautomated"
+
+gcloud iam roles create cloud_run_deployer \
+    --project=$PROJECT_ID \
+    --file=infrastructure/cloud_run_deployer_role.yaml
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            The last thing is to bind the role to the GitHub's identities.
+        </p>
+
+        <h4 id="iam-policy-binding">IAM policy binding</h4>
+
+        <p>
+            To create a binding, one gcloud command will suffice:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+PROJECT_ID="toolongautomated"
+WORKLOAD_IDENTITY_POOL_ID="[THIS IS THE OUTPUT OF THE Workload identity pool STEP]"
+REPO_OWNER="toolongautomated"
+REPO_NAME="tutorial-1"
+PRINCIPAL="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${REPO_OWNER}/${REPO_NAME}"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member=$principal \
+    --role="projects/$PROJECT_ID/roles/cloud_run_deployer"
+            </code>
+        </pre>
+
+        <h4 id="manage-setup-iam-command">Bonus: wrap into <code>manage setup-iam</code> command</h4>
+
+        <p>
+            All the steps above can be wrapped into a convenient bash script (see full script <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/5-automations/manage">here</a>):
+        </p>
+
+        <pre>
+            <code class="language-bash">
+...
+
+"setup-iam")
+    if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+        echo "Error: Missing required arguments"
+        help
+        exit 1
+    fi
+
+    repo_owner="$2"
+    repo_name="$3"
+    project_id="$4"
+
+    # Create a new workload identity pool for GitHub Actions
+    workload_identity_pool_id=$(gcloud iam workload-identity-pools create "github" \
+        --project="$project_id" \
+        --location="global" \
+        --display-name="GitHub Actions Pool" \
+        --format="value(name)")
+
+    # Create a new provider for the GitHub Actions pool.
+    gcloud iam workload-identity-pools providers create-oidc "$repo_name" \
+        --project="$project_id" \
+        --location="global" \
+        --workload-identity-pool="github" \
+        --display-name="GitHub Actions identity provider" \
+        --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+        --attribute-condition="assertion.repository_owner == '$repo_owner'" \
+        --issuer-uri="https://token.actions.githubusercontent.com"
+
+    # Get the full identity provider name.
+    full_provider_name=$(gcloud iam workload-identity-pools providers describe "$repo_name" \
+        --project="$project_id" \
+        --location="global" \
+        --workload-identity-pool="github" \
+        --format="value(name)")
+
+    # Create a custom role for the GitHub Actions workflow to use to deploy to Cloud Run.
+    gcloud iam roles create cloud_run_deployer --project="$project_id" \
+        --file=infrastructure/cloud_run_deployer_role.yaml
+
+    principal="principalSet://iam.googleapis.com/${workload_identity_pool_id}/attribute.repository/${repo_owner}/${repo_name}"
+
+    # Create and configure IAM policy binding for the custom role.
+    gcloud projects add-iam-policy-binding "$project_id" \
+        --member="$principal" \
+        --role="projects/$project_id/roles/cloud_run_deployer"
+
+    echo "Full provider name: $full_provider_name. Copy this value to your GitHub Actions workflow (google-github-actions/auth@v2 step)"
+    echo ""
+    echo "IAM resources created successfully!"
+    ;;
+
+...
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            That's all what we needed to do to set up Workload Identity Federation. Now, we can proceed to the next step
+            (actually implementing some GitHub Actions workflows).
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h3 id="git-tags--docker-image-build--push">git tags + Docker image build & push</h3>
+
+        <figure class="article-internal-image">
+            <img src="2/git-tags-docker-image-light.svg" alt="git tags + Docker image build & push"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="light">
+            <img src="2/git-tags-docker-image-dark.svg" alt="git tags + Docker image build & push"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="dark">
+        </figure>
+
+        <p>
+            You may wonder:
+        </p>
+
+        <div class="key-concept">
+            Why put docker image building and pushing together with git tag creation in the same workflow, not in two
+            separate ones?
+        </div>
+
+        <p>
+            Initially, that's precisely what I wanted to do. My plan was to have one workflow that would trigger
+            whenever a new version of the application is released and create a new git tag as a result. Then, the second
+            workflow would monitor for new tag creation and build and push new Docker image to the registry.
+            Unfortunately, I found out that if the tag gets created automatically via GitHub Actions workflow, <b>it
+                does not trigger downstream workflows (see <a
+                    href="https://github.com/orgs/community/discussions/27028">this discussion</a> on GitHub).</b> Some
+            people suggested attaching my PAT to the workflow and let it impersonate these credentials, however, I
+            didn't like this approach (it felt too hacky). Eventually, I realized that merging the two into a single
+            GitHub Actions workflow is not such a bad idea, so that's what I did.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Whenever a new version of the application is released, a <b>new git tag will be created first</b>.
+        </p>
+
+        <p>
+            It will happen automatically through the <code>tag_build_push</code>
+            GitHub Actions workflow. This workflow will trigger on pushes to the <code>main</code> branch, whenever
+            changes are made to application-related files.
+        </p>
+
+        <p>
+            The workflow should fail if:
+        </p>
+
+        <ul class="article-list" style="list-style: none;">
+            <li>❌ application-related files are modified without updating changelog</li>
+            <li>❌ changelog version unchanged from previous version, even though app-related source files were modified
+                as part of the commit</li>
+            <li>❌ new tag would be created but it already exists</li>
+        </ul>
+
+        <p>
+            The workflow relies on the <code>app/CHANGELOG.md</code> and requires it to follow a specific format:
+        </p>
+
+        <pre>
+            <code class="language-markdown">
+# Sample changelog file
+
+## 1.0.1
+
+Changes description...
+
+## 1.0.0
+
+Initial release…
+            </code>
+        </pre>
+
+        <br>
+
+        <ul class="article-list">
+            <li>each version must be a level-2 header (<code>##</code>)</li>
+            <li>version numbers must follow semantic versioning (<code>X.Y.Z</code>)</li>
+            <li>latest version should be at the top of the file</li>
+        </ul>
+
+        <p>
+            Here are the first two jobs responsible for the above:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+name: Maybe create a tag for a new release of the app and build its Docker image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/src/*.py'
+      - 'app/requirements.txt'
+      - 'app/Dockerfile'
+      - 'app/.dockerignore'
+
+jobs:
+  verify-changelog:
+    runs-on: ubuntu-22.04
+    outputs:
+      changelog-updated: ${{ steps.changes.outputs.app }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if CHANGELOG.md was updated
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            app:
+              - 'app/CHANGELOG.md'
+
+      - name: Fail if CHANGELOG.md was not updated
+        if: steps.changes.outputs.app == 'false'
+        run: |
+          echo "Error: Changes detected in app files but CHANGELOG.md was not updated"
+          exit 1
+
+  tag:
+    needs: verify-changelog
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.tag_version.outputs.tag }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect and tag new version
+        id: tag_version
+        uses: salsify/action-detect-and-tag-new-version@v2
+        with:
+          tag-template: '{VERSION}'
+          version-command: "sed -n 's/^## \\([0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\)/\\1/p' app/CHANGELOG.md | head -n 1"
+          tag-annotation-template: 'Released version {VERSION} of the app'
+            </code>
+        </pre>
+
+        <div class="content-separator"></div>
+
+        <p>
+            Once the tag is successfully created, the <code>tag_build_push</code> workflow proceeds to <b>building a
+                Docker image and pushing it to Docker Hub</b> (registry provider used purely for illustrative purposes).
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+...
+
+  build:
+    needs: tag
+    if: needs.tag.outputs.tag
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: toolongautomated/tutorial-1
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ needs.tag.outputs.tag }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: app
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            See the full workflow <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/5-automations/.github/workflows/tag_build_push.yaml">here</a>.
+        </p>
+
+        <p>
+            To push images to Docker Hub, a personal access token (PAT) with the necessary permissions is required. You
+            can create a PAT using a dedicated <a href="https://app.docker.com/settings/personal-access-tokens">Docker
+                Hub settings page</a>.
+        </p>
+
+        <p>
+            Ensure that the token has <code>Read & Write</code> scopes.
+        </p>
+
+        <p>
+            Once the PAT is created, it needs to be added to the GitHub repository secrets:
+        </p>
+
+        <ol class="article-list">
+            <li>Go to the repository settings, click on <code>Secrets and variables</code>, and then click on
+                <code>New repository secret</code>.
+            </li>
+            <li>Add two secrets: <code>DOCKER_USERNAME</code> (Docker Hub account username) and
+                <code>DOCKER_TOKEN</code> (PAT).
+            </li>
+        </ol>
+
+        <p>
+            Check out tutorial's <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/5-automations/.github/workflows/tag_build_push.yaml">GitHub
+                repo</a> for the source of the full workflow.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h3 id="deploy-to-cloud-run">Deploy to Cloud Run</h3>
+
+        <figure class="article-internal-image">
+            <img src="2/deploy-cloud-run-light.svg" alt="Deploy to Cloud Run"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="light">
+            <img src="2/deploy-cloud-run-dark.svg" alt="Deploy to Cloud Run"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="dark">
+        </figure>
+
+        <p>
+            The <code>deploy</code> GitHub Actions workflow can deploy the application to Cloud Run. It will be
+            triggered on every push to the <code>main</code> branch, whenever any of the <code>.env</code> files gets
+            modified. Why Cloud Run? As mentioned in my <a
+                href="https://www.toolongautomated.com/posts/2025/one-branch-to-rule-them-all-3.html#deploy-to-cloud-run">previous
+                article</a>, Google Cloud Platform offers a <a
+                href="https://cloud.google.com/free/docs/free-cloud-features">free tier</a>. As part of it (as of
+            2025-02-21), you can use Cloud Run for free (to some extent). Cloud Run lets you run your app in containers
+            without worrying about servers. It scales up and down as needed and only costs when it's running. It's great
+            for small services and APIs. That all makes it particularly useful for our scenario.
+        </p>
+
+        <p>
+            As a quick recap: <code>deploy/environments</code> directory contains subdirectories, each storing a
+            <code>.env</code> file associated with the deployment environment. Name of the subdirectory corresponds to
+            the name of the environment it serves (case-specific!). <code>deploy</code> workflow monitors for changes in
+            these files. <b>If multiple <code>.env</code> files are modified, the workflow will deploy the application
+                to all affected environments.</b>
+        </p>
+
+        <p>
+            To enable Workload Identity Federation as an authentication mechanism, several resources need to be created.
+            Install <code>gcloud</code> CLI and use <code>setup-iam</code> command from the <code>manage</code> script
+            to configure:
+        </p>
+
+        <ul class="article-list">
+            <li>a new workload identity pool for GitHub Actions</li>
+            <li>a new provider for the GitHub Actions pool</li>
+            <li>a new IAM role for the GitHub Actions pool</li>
+            <li>a new IAM policy binding for the GitHub Actions pool</li>
+        </ul>
+
+        <p>
+            The command template is:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage setup-iam [REPO_OWNER] [REPO_NAME] [PROJECT_ID]
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Example:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage setup-iam toolongautomated tutorial-1 toolongautomated
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            <code>setup-iam</code> outputs the full identity provider name. Use it in the <code>deploy</code> GitHub
+            Actions workflow:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+- name: 'Authenticate to Google Cloud'
+  uses: 'google-github-actions/auth@v2'
+  with:
+    project_id: '[GCP_PROJECT_ID]'
+    workload_identity_provider: '[FULL_PROVIDER_NAME]'
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Example:
+        </p>
+
+        <pre>
+            <code class="language-yaml">
+- name: 'Authenticate to Google Cloud'
+  uses: 'google-github-actions/auth@v2'
+  with:
+    project_id: 'toolongautomated'
+    workload_identity_provider: 'projects/572404090605/locations/global/workloadIdentityPools/github/providers/tutorial-1'
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Check out <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/main/.github/workflows/deploy.yaml">this
+                link</a> for the full <code>deploy</code> workflow source.
+        </p>
+
+        <div class="key-concept">
+            <b>🚨 Remember</b>
+            <br><br>
+            Once done playing with the Cloud Run deployment, remember to <b>delete the service</b>. Otherwise, you may
+            be
+            charged for running it for too long outside of the free tier. Read more about it <a
+                href="https://www.toolongautomated.com/posts/2025/one-branch-to-rule-them-all-3.html#deploy-to-cloud-run">here</a>.
+        </div>
+
+        <p>
+            <code>delete</code> command can be used to delete the service:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage delete [ENVIRONMENT] [PREFIX]
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            Prefix is optional and will be attached to the service name. Example:
+        </p>
+
+        <pre>
+            <code class="language-bash">
+./manage delete staging test
+            </code>
+        </pre>
+
+        <br>
+
+        <p>
+            This will attempt to delete the service <code>test-[SERVICE NAME]-staging</code>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h3 id="run-unit-tests">Run unit tests</h3>
+
+        <figure class="article-internal-image">
+            <img src="2/run-unit-tests-light.svg" alt="Run unit tests" style="width: 100%; height: auto; display: none;"
+                class="theme-specific" data-theme="light">
+            <img src="2/run-unit-tests-dark.svg" alt="Run unit tests" style="width: 100%; height: auto; display: none;"
+                class="theme-specific" data-theme="dark">
+        </figure>
+
+        <p>
+            Whenever a pull request is opened or a new commit is added to it, the <code>test_unit</code> workflow will
+            be executed. It will run unit tests and publish the results to the PR as a comment if any of the
+            application-related files are modified.
+        </p>
+
+        <p>
+            Check out the source <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/main/.github/workflows/test_unit.yaml">here</a>.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h3 id="run-integration-tests">Run Integration tests</h3>
+
+        <figure class="article-internal-image">
+            <img src="2/run-integration-tests-light.svg" alt="Run integration tests"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="light">
+            <img src="2/run-integration-tests-dark.svg" alt="Run integration tests"
+                style="width: 100%; height: auto; display: none;" class="theme-specific" data-theme="dark">
+        </figure>
+
+        <p>
+            The <code>test_integration</code> workflow runs integration tests whenever <code>.env</code> files are
+            modified in a pull request. For each modified environment:
+        </p>
+
+        <ol class="article-list">
+            <li>Deploys a test instance to Cloud Run with <code>test-</code> prefix.</li>
+            <li>Runs integration tests against the deployed instance.</li>
+            <li>Posts test results as a PR comment.</li>
+            <li>Deletes the test instance.</li>
+        </ol>
+
+        <p>
+            The workflow requires the same GCP authentication setup as the <code>deploy</code> workflow.
+        </p>
+
+        <p>
+            Last but not least, here's the <a
+                href="https://github.com/toolongautomated/tutorial-1/blob/main/.github/workflows/test_integration.yaml">source</a>.
+            I believe the code is self-explanatory, but if anything is unclear or raises extra questions in your head,
+            feel free to reach out to me. I'll do my best to help with your confusion and update the article
+            accordingly.
+        </p>
+
+        <div class="content-separator"></div>
+
+        <h2 id="stop">🛑 Stop</h2>
+
+        <p>
+            Being a perfectionist, I suffer from a severe syndrome: having a hard time saying "done". I know how it
+            sounds, but trust me – if you become passionate enough about what you're building and start simply enjoying
+            the design and coding processes, it's so hard to stop. The reason is quite simple:
+        </p>
+
+        <div class="key-concept">
+            Code & architecture can always be improved.
+        </div>
+
+        <p>
+            Keep in mind, my friend, that our goal as developers is not to deliver perfect solutions – we need to build
+            things that are <b>good enough for our clients</b>. Remind yourself of that whenever you find yourself
+            trying too hard to achieve perfection.
+        </p>
+
+        <p>
+            Don't let this trap catch you, buddy.
+        </p>
+
+        <figure class="article-internal-gif">
+            <img src="https://c.tenor.com/UsUDqY5lp0kAAAAd/tenor.gif" alt="wink" style="width: 100%; height: auto;">
+            <figcaption style="text-align: center">
+                Source: <a href="https://tenor.com/pl/view/mr-bean-wink-trust-me-funny-gif-12503093">tenor.com</a>
+            </figcaption>
+        </figure>
+
+        <div class="content-separator"></div>
+
+        <h2 id="conclusion">🏁 Conclusion</h2>
+
+        <p>
+            Dang, this is really it... We've reached the end of this guided series!
+        </p>
+
+        <p>
+            I hope you not only enjoyed the ride, but also learned something new. Now, you should better understand the
+            full process, from requirements gathering to the very deployment (and even some basic automation).
+        </p>
+
+        <p>
+            If you liked this series, please consider sharing it with your friends and colleagues.
+        </p>
+
+        <p>
+            If you have any questions or feedback, please let me know. I'd love to hear from you.
+        </p>
+
+        <p>
+            Thanks for reading and hope to see you around!
+        </p>
+
+        <div class="article-navigation">
+            <div class="nav-buttons">
+                <a href="one-branch-to-rule-them-all-3.html" class="nav-button prev-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #3</span></div>
+                        </div>
+                        <img src="1/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>too long; automated</h3>
+                <p class="footer-description">Exploring digital world to automate it and enjoy life. <span
+                        style="white-space: nowrap;">Written by Bartosz Miselis</span>
+                </p>
+                <br>
+                <a href="mailto:toolongautomated@gmail.com">toolongautomated@gmail.com</a>
+            </div>
+            <div class="footer-column">
+                <div class="footer-social">
+                    <div class="social-item">
+                        <img src="../../assets/github.svg" alt="GitHub" class="social-icon">
+                        <a href="https://github.com/toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/x.svg" alt="X" class="social-icon">
+                        <a href="https://x.com/bmiselis" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/linkedin.svg" alt="LinkedIn" class="social-icon">
+                        <a href="https://www.linkedin.com/in/bmiselis/" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/youtube.svg" alt="YouTube" class="social-icon">
+                        <a href="https://www.youtube.com/@toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="zoom-overlay" class="zoom-overlay">
+        <img id="zoomed-img" class="zoomed-image" alt="Zoomed Image">
+    </div>
+    <script src="../../scripts/theme.js"></script>
+    <script src="../../scripts/zoomable.js"></script>
+    <script src="../../scripts/interactions.js"></script>
+    <script src="../../highlight/highlight.min.js"></script>
+    <script src="../../scripts/progressbar.js"></script>
+
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>

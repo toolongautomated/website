@@ -61,7 +61,7 @@
 
         <p>
             <b>tl;dr:</b> My goal for this short series is very simple: <b>teach
-                you by example</b>. Together, we’re going through the full process I
+                you by example</b>. Together, we're going through the full process I
             follow to solve various problems:
         </p>
 
@@ -194,7 +194,7 @@
         </div>
 
         <p>
-            I’m fully aware that there are many different formats and standards
+            I'm fully aware that there are many different formats and standards
             that can be used to manage configuration of the applications and
             deployments.
         </p>
@@ -232,12 +232,12 @@ DOCKER_IMAGE=toolongautomated/tutorial-1:1.0.0
 
         <p>
             As you can see, it just stores shell variables, one in every row. It
-            doesn’t have any sections, nested structure, none.
+            doesn't have any sections, nested structure, none.
         </p>
 
         <p>
             <b>YAML</b> can do what .env does + much, much more. We will briefly
-            mention basic structure, but if you’d like to read about all that is
+            mention basic structure, but if you'd like to read about all that is
             available, go and dive into raw <a href="https://yaml.org/spec/1.2.2/">specification</a> of this
             language.
         </p>
@@ -308,7 +308,7 @@ app2:
         <br>
 
         <p>
-            Basic .env file wouldn’t allow to do that without using e.g. long
+            Basic .env file wouldn't allow to do that without using e.g. long
             prefixes:
         </p>
 
@@ -324,8 +324,8 @@ APP2_DOCKER_TAG=0.4.0
         <br>
 
         <p>
-            Don’t get me wrong, it’s still completely fine, but some may find it
-            harder to grasp in the first look. Let’s look at the YAML example
+            Don't get me wrong, it's still completely fine, but some may find it
+            harder to grasp in the first look. Let's look at the YAML example
             converted to .env:
         </p>
 
@@ -350,7 +350,7 @@ APP2_DOCKER_TAG=0.4.0
         <br>
 
         <p>
-            It’s not that bad!
+            It's not that bad!
         </p>
 
         <figure class="article-internal-gif">
@@ -362,23 +362,23 @@ APP2_DOCKER_TAG=0.4.0
         </figure>
 
         <p>
-            You know what, for our mini-project, let’s proceed with .env.
+            You know what, for our mini-project, let's proceed with .env.
         </p>
 
         <div class="key-concept">
-            It’s extremely <b>simple</b>, yet <b>versatile</b> enough for our use
+            It's extremely <b>simple</b>, yet <b>versatile</b> enough for our use
             case.
         </div>
 
         <p>
             Moreover, this tutorial is not about complex logic, but rather about
             general patterns that I consider good practices. Using YAML would
-            complicate our flow a bit as it’d require installing <a href="https://github.com/mikefarah/yq">additional
+            complicate our flow a bit as it'd require installing <a href="https://github.com/mikefarah/yq">additional
                 dependency
                 (yq)</a> to parse YAML from CLI and learning its syntax first. I
-            don’t want us to focus on that here, so nope. However, in the
-            project you’re building, I totally recommend doing it with YAML. It
-            won’t be hard to switch from what you’ll see below from .env to YAML
+            don't want us to focus on that here, so nope. However, in the
+            project you're building, I totally recommend doing it with YAML. It
+            won't be hard to switch from what you'll see below from .env to YAML
             🙌🏼
         </p>
 
@@ -426,7 +426,7 @@ requirements.txt
         </div>
 
         <p>
-            Here is a summary what we’ve got so far:
+            Here is a summary what we've got so far:
         </p>
 
         <ul class="article-list">
@@ -437,20 +437,20 @@ requirements.txt
         </ul>
 
         <p>
-            Next, let’s start with the <b>deployment platform</b>. I think that
+            Next, let's start with the <b>deployment platform</b>. I think that
             giving you a chance to play with something real (cloud) instead of a
-            local playground (your machine) will be invaluable. I’ve analyzed <a
+            local playground (your machine) will be invaluable. I've analyzed <a
                 href="https://cloud.google.com/free/docs/free-cloud-features">free
                 tier rules</a> of the Google Cloud Platform and realized that <b>Cloud
                 Run</b> will be a perfect choice to play with multi-environment
-            deployment tutorial. It is because for our short experiments, <b>it’ll
+            deployment tutorial. It is because for our short experiments, <b>it'll
                 be free to use</b><sup><a href="#footnote-1" class="footnote-ref" id="footnote-ref-1">1</a></sup>.
         </p>
 
         <p>
-            If you’d like this tutorial to be a true hands-on experience, I
+            If you'd like this tutorial to be a true hands-on experience, I
             highly encourage you to set up a GCP project and play with it in
-            the rest of this tutorial. I’ve prepared a short video on how to
+            the rest of this tutorial. I've prepared a short video on how to
             create a new project if this is your first time doing it:
         </p>
 
@@ -463,7 +463,7 @@ requirements.txt
         </figure>
 
         <p>
-            If you prefer to read, here’s the official docs for you: <a
+            If you prefer to read, here's the official docs for you: <a
                 href="https://developers.google.com/workspace/guides/create-project">link</a>.
         </p>
 
@@ -472,8 +472,8 @@ requirements.txt
             do anything outside of the <a href="https://cloud.google.com/free/docs/free-cloud-features">free
                 tier</a>. My rule of thumb is that if I have any doubt whether
             something will cost some money or not, I try to search for the
-            answer online. If I can’t find a reasonable explanation, I simply
-            <b>avoid using the feature</b>. Unless I’m okay paying, then don’t
+            answer online. If I can't find a reasonable explanation, I simply
+            <b>avoid using the feature</b>. Unless I'm okay paying, then don't
             worry about the research 😅
         </div>
 
@@ -486,11 +486,11 @@ requirements.txt
         <div class="key-concept">
             <b>tl;dr:</b> Cloud Run lets you run your app in containers without
             worrying about servers. It scales up and down as needed and only
-            costs when it’s running. It’s great for small services and APIs.
+            costs when it's running. It's great for small services and APIs.
         </div>
 
         <p>
-            <i>Let’s you run app in containers</i> – that’s exactly what we
+            <i>Let's you run app in containers</i> – that's exactly what we
             need! Let me show you how to deploy our Flask server as a Cloud Run
             service.
         </p>
@@ -498,13 +498,13 @@ requirements.txt
         <h3 id="configure-gcloud-cli">Configure gcloud CLI</h3>
 
         <p>
-            We’re programmers, so we’re not using any UI to configure stuff, are
+            We're programmers, so we're not using any UI to configure stuff, are
             we? 🥲
         </p>
 
         <p>
             Google provides a dedicated CLI tool to manipulate GCP infrastructure
-            from a local machine. It’s called <b>gcloud</b> and here are the
+            from a local machine. It's called <b>gcloud</b> and here are the
             <a href="https://cloud.google.com/sdk/docs/install">instructions</a>
             on how to install it.
         </p>
@@ -554,7 +554,7 @@ gcloud auth application-default set-quota-project [YOUR PROJECT ID]
         </div>
 
         <p>
-            With gcloud set, we’re good to deploy.
+            With gcloud set, we're good to deploy.
         </p>
 
         <h3 id="deploy-to-cloud-run">Deploy to Cloud Run</h3>
@@ -586,7 +586,7 @@ gcloud run deploy tla-tutorial-1-staging \
             </li>
             <li>
                 <i>image</i> is the Docker image that will be deployed. Cloud Run
-                supports GCP’s Artifact Registry and Docker
+                supports GCP's Artifact Registry and Docker
                 Hub
                 out of the box.
             </li>
@@ -619,7 +619,7 @@ gcloud run deploy tla-tutorial-1-staging \
         </figure>
 
         <p>
-            It is possible to get the public URL for the service you’ve just deployed:
+            It is possible to get the public URL for the service you've just deployed:
         </p>
 
         <pre>
@@ -648,7 +648,7 @@ gcloud run services list
         </figure>
 
         <p>
-            Once you’re satisfied with your deployment, let’s delete it:
+            Once you're satisfied with your deployment, let's delete it:
         </p>
 
         <pre>
@@ -661,7 +661,7 @@ gcloud run services delete tla-tutorial-1-staging \
         <br>
 
         <p>
-            That’s basically it – we deployed a containerized application to
+            That's basically it – we deployed a containerized application to
             Cloud Run 🚀
         </p>
 
@@ -675,17 +675,17 @@ gcloud run services delete tla-tutorial-1-staging \
         <p>
             gcloud commands above are rather straightforward, I know. They may
             even be straightforward enough to not do anything more with them.
-            But I’d like to show you a flow leveraging bash scripting that will
+            But I'd like to show you a flow leveraging bash scripting that will
             let you run your app in an arbitrary deployment environment
-            effortlessly. However, to delete a service, we’ll still use gcloud
+            effortlessly. However, to delete a service, we'll still use gcloud
             command instead of the bash wrapper. My take on deletion is that it
-            often needs to be done carefully, and hence I’m very reluctant to
+            often needs to be done carefully, and hence I'm very reluctant to
             automate such actions.
         </p>
 
         <p>
             There are several parameters we need to provide to Cloud Run so that
-            it can create a working service from our Docker image. Let’s put
+            it can create a working service from our Docker image. Let's put
             these to our .env files:
         </p>
 
@@ -720,15 +720,15 @@ PORT=80
         <p>
             Both staging and production will be running the same version of the
             application, with the same configuration. The only difference will
-            be env. As Cloud Run doesn’t natively support environments or
-            namespaces, I’m going to simulate this behavior by adding a suffix
-            to the service name that will indicate in which “environment” the
+            be env. As Cloud Run doesn't natively support environments or
+            namespaces, I'm going to simulate this behavior by adding a suffix
+            to the service name that will indicate in which "environment" the
             service is running.
         </p>
 
         <p>
             We need a way to parameterize gcloud deployment command so that the
-            values from a user-selected .env file will be used. For this, I’ve
+            values from a user-selected .env file will be used. For this, I've
             created the following bash script:
         </p>
 
@@ -867,13 +867,13 @@ gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
         </div>
 
         <p>
-            Yeah, that’s it. Nobody said it’s gonna be hard!
+            Yeah, that's it. Nobody said it's gonna be hard!
         </p>
 
         <p>
             Whenever your apps require additional options for deployment, you
             can simply modify the bash script (called <i>manage</i> in this
-            tutorial) and adjust it to your needs – it’s flexible enough to
+            tutorial) and adjust it to your needs – it's flexible enough to
             handle many, many use cases.
         </p>
 
@@ -927,7 +927,7 @@ gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
         </ol>
 
         <p>
-            That’s how you do it 🙌🏼
+            That's how you do it 🙌🏼
         </p>
 
         <h1 id="stop?">🛑 Stop?</h1>
@@ -936,7 +936,7 @@ gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
         <div class="article-internal-gif">
             <img src="https://c.tenor.com/D2BOzsv2ckIAAAAd/tenor.gif" alt="Nope" style="width: 100%; height: auto;">
             <figcaption style="text-align: center">
-                If you’re from <a
+                If you're from <a
                     href="https://www.peacecorps.gov/connect/blog/yes-or-no-depends-on-which-country-youre-in/#:~:text=Then%20I%20remember%3A%20A%20shake,lead%20to%20so%20much%20confusion."
                     target="_blank">Bulgaria</a>, that means <b>no</b>.
                 <br>
@@ -945,7 +945,7 @@ gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
         </div>
 
         <p>
-            Did you really think we’re going to stop here, buddy? I hope not!
+            Did you really think we're going to stop here, buddy? I hope not!
         </p>
 
         <p>
@@ -995,6 +995,16 @@ gcloud run deploy $SERVICE_NAME-$ENVIRONMENT \
                             <div class="nav-title">Thoughts on OpenAI o3 model</div>
                         </div>
                         <img src="../2024/6/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+                <a href="one-branch-to-rule-them-all-4.html" class="nav-button next-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">next article →</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #4</span></div>
+                        </div>
+                        <img src="2/image-square.webp" alt="Next Article" class="nav-thumbnail">
                     </div>
                 </a>
             </div>
