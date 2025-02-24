@@ -1,0 +1,122 @@
+/* Archive Page Styles */
+
+h1 {
+    margin-bottom: 1rem;
+}
+
+.archive-description {
+    margin-bottom: 2rem;
+}
+
+/* Filter buttons */
+.archive-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.filter-btn {
+    padding: 0.5rem 0.8rem;
+    background-color: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+    position: relative;
+    background: var(--bg-color);
+}
+
+.filter-btn::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+    background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
+}
+
+.filter-btn:hover {
+    background-color: var(--hover-bg);
+}
+
+.filter-btn.active {
+    background-color: var(--hover-bg);
+}
+
+/* Series buttons */
+.series-buttons {
+    width: 100%;
+    display: none;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.series-buttons.visible {
+    display: flex;
+    background: none;
+}
+
+.series-btn {
+    padding: 0.5rem 0.8rem;
+    background-color: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+    position: relative;
+    background: var(--bg-color);
+}
+
+.series-btn::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+    background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
+}
+
+.series-btn:hover {
+    background-color: var(--hover-bg);
+}
+
+.series-btn.active {
+    background-color: var(--hover-bg);
+}
+
+/* Article list */
+.article-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    margin: 0;
+    background: none;
+}
+
+
+/* Handle filtered articles */
+.article-card.hidden {
+    display: none;
+}
+
+.no-results-message {
+    padding: 2rem;
+    text-align: center;
+    color: var(--secondary-text-color);
+}

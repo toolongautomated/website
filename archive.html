@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles/light-theme.css">
     <link rel="stylesheet" href="styles/dark-theme.css">
     <link rel="stylesheet" href="styles/mobile.css">
+    <link rel="stylesheet" href="styles/archive.css">
 </head>
 
 <body>
@@ -33,12 +34,22 @@
     <main>
         <h1>archive</h1>
 
-        <p class="archive-description">Here, I've gathered all the articles that were published on the blog.</p>
+        <div class="archive-filter">
+            <button class="filter-btn active" data-filter="all">all</button>
+            <button class="filter-btn" data-filter="series" id="series-btn">series</button>
+            <button class="filter-btn" data-filter="commentary">commentary</button>
+            <button class="filter-btn" data-filter="philosophy">philosophy</button>
+            <div class="series-buttons">
+                <button class="series-btn" data-series="one branch to rule them all">one branch to rule them
+                    all</button>
+            </div>
+        </div>
 
-        <div class="archive-year">
-            <h2>2025</h2>
-
-            <a href="posts/2025/one-branch-to-rule-them-all-4.html" class="article-card">
+        <!-- Flat article list container -->
+        <div class="article-list">
+            <!-- All articles in chronological order -->
+            <a href="posts/2025/one-branch-to-rule-them-all-4.html" class="article-card" data-category="series"
+                data-date="2025-02-21" data-series="one branch to rule them all">
                 <div class="article-content">
                     <h3 class="article-card-title">one branch to rule them all <span style="white-space: nowrap;">|
                             guided series #4</span>
@@ -52,11 +63,12 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2025/2/image-wide.webp">
-                    <img src="posts/2025/2/image-square.webp" alt="one branch to rule them all" class="article-image">
+                    <img src="posts/2025/2/image-square.webp" alt="one branch to rule them all">
                 </picture>
             </a>
 
-            <a href="posts/2025/one-branch-to-rule-them-all-3.html" class="article-card">
+            <a href="posts/2025/one-branch-to-rule-them-all-3.html" class="article-card" data-category="series"
+                data-date="2025-01-13" data-series="one branch to rule them all">
                 <div class="article-content">
                     <h3 class="article-card-title">one branch to rule them all <span style="white-space: nowrap;">|
                             guided series #3</span>
@@ -68,15 +80,12 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2025/1/image-wide.webp">
-                    <img src="posts/2025/1/image-square.webp" alt="one branch to rule them all" class="article-image">
+                    <img src="posts/2025/1/image-square.webp" alt="one branch to rule them all">
                 </picture>
             </a>
-        </div>
 
-        <div class="archive-year">
-            <h2>2024</h2>
-
-            <a href="posts/2024/thoughts-on-openai-o3.html" class="article-card">
+            <a href="posts/2024/thoughts-on-openai-o3.html" class="article-card" data-category="commentary"
+                data-date="2024-12-21">
                 <div class="article-content">
                     <h3 class="article-card-title">Thoughts on OpenAI o3 model</h3>
                     <p class="article-card-subtitle">On December 20th, OpenAI released o3 – second generation reasoning
@@ -85,11 +94,12 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2024/6/image-wide.webp">
-                    <img src="posts/2024/6/image-square.webp" alt="OpenAI o3 model" class="article-image">
+                    <img src="posts/2024/6/image-square.webp" alt="OpenAI o3 model">
                 </picture>
             </a>
 
-            <a href="posts/2024/one-branch-to-rule-them-all-2.html" class="article-card">
+            <a href="posts/2024/one-branch-to-rule-them-all-2.html" class="article-card" data-category="series"
+                data-date="2024-12-13" data-series="one branch to rule them all">
                 <div class="article-content">
                     <h3 class="article-card-title">one branch to rule them all <span style="white-space: nowrap;">|
                             guided series #2</span>
@@ -100,11 +110,12 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2024/3/image-wide.webp">
-                    <img src="posts/2024/3/image-square.webp" alt="one branch to rule them all" class="article-image">
+                    <img src="posts/2024/3/image-square.webp" alt="one branch to rule them all">
                 </picture>
             </a>
 
-            <a href="posts/2024/one-branch-to-rule-them-all-1.html" class="article-card">
+            <a href="posts/2024/one-branch-to-rule-them-all-1.html" class="article-card" data-category="series"
+                data-date="2024-11-13" data-series="one branch to rule them all">
                 <div class="article-content">
                     <h3 class="article-card-title">one branch to rule them all <span style="white-space: nowrap;">|
                             guided series #1</span>
@@ -116,11 +127,12 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2024/2/image-wide.webp">
-                    <img src="posts/2024/2/image-square.webp" alt="one branch to rule them all" class="article-image">
+                    <img src="posts/2024/2/image-square.webp" alt="one branch to rule them all">
                 </picture>
             </a>
 
-            <a href="posts/2024/automation-unbound.html" class="article-card">
+            <a href="posts/2024/automation-unbound.html" class="article-card" data-category="philosophy"
+                data-date="2024-10-15">
                 <div class="article-content">
                     <h3 class="article-card-title">automation unbound</h3>
                     <p class="article-card-subtitle">From ancient tools to AI-powered minds, discover how automation is
@@ -129,7 +141,7 @@
                 </div>
                 <picture>
                     <source media="(max-width: 600px)" srcset="posts/2024/1/image-wide.webp">
-                    <img src="posts/2024/1/image-square.webp" alt="automation unbound" class="article-image">
+                    <img src="posts/2024/1/image-square.webp" alt="automation unbound">
                 </picture>
             </a>
         </div>
@@ -169,6 +181,7 @@
         </div>
     </footer>
     <script src="scripts/theme.js"></script>
+    <script src="scripts/archive.js"></script>
     <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
 
