@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe coding is not coding | too long; automated</title>
+    <meta name="description"
+        content="LLMs make it possible to directly translate human language into code, making them valuable proxies that can express what we mean in a source code.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://www.toolongautomated.com/posts/2025/vibe-coding-is-not-coding.html">
+    <meta property="og:title" content="Vibe coding is not coding">
+    <meta property="og:description"
+        content="LLMs make it possible to directly translate human language into code, making them valuable proxies that can express what we mean in a source code.">
+    <meta property="og:image" content="https://www.toolongautomated.com/posts/2025/3/image-wide.webp">
+    <meta property="og:site_name" content="too long; automated">
+    <meta property="article:published_time" content="2024-12-13">
+    <meta property="article:author" content="Bartosz Miselis">
+    <meta property="article:section" content="commentary">
+    <meta property="article:tag" content="AI">
+    <meta property="article:tag" content="vibe coding">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://www.toolongautomated.com/posts/2025/vibe-coding-is-not-coding.html">
+    <meta property="twitter:title" content="Vibe coding is not coding">
+    <meta property="twitter:description"
+        content="LLMs make it possible to directly translate human language into code, making them valuable proxies that can express what we mean in a source code.">
+    <meta property="twitter:image" content="https://www.toolongautomated.com/posts/2025/3/image-square.webp">
+    <meta name="twitter:creator" content="@bmiselis">
+
+    <link rel="icon" type="image/png" href="../../assets/logo-dark.png">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/light-theme.css">
+    <link rel="stylesheet" href="../../styles/dark-theme.css">
+    <link rel="stylesheet" href="../../styles/mobile.css">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-light.min.css" class="theme-specific"
+        data-theme="light">
+    <link rel="stylesheet" href="../../highlight/styles/stackoverflow-dark.min.css" class="theme-specific"
+        data-theme="dark">
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <img src="../../assets/logo-dark.png" class="logo-image">
+            <div class="title-group">
+                <span class="site-title">too long; automated</span>
+                <div class="tdnn">
+                    <div class="moon"></div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html" style="border-bottom: none;">home</a></li>
+                <li><a href="../../archive.html" style="border-bottom: none;">archive</a></li>
+                <li><a href="../../about.html" style="border-bottom: none;">about</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <figure class="article-internal-image">
+            <img src="3/image-wide.webp" alt="Vibe coding is not coding">
+        </figure>
+
+        <h1>Vibe coding is not coding</h1>
+
+        <p class="article-subtitle">
+            But it doesn’t mean you shouldn’t do it.
+        </p>
+
+        <div class="article-meta">March 11, 2025</div>
+
+        <br>
+
+        <p>What is vibe coding in the first place?</p>
+
+        <div class="key-concept">
+            <b>tl;dr:</b> telling AI what to code with it figuring out how to do it.
+        </div>
+
+        <p>
+            It’s the term coined by <a href="https://x.com/karpathy">Andrej Karpathy</a> in one of his tweets:
+        </p>
+
+        <figure class="article-internal-image">
+            <img src="3/karpathy-tweet.png" alt="Karpathy tweet on vibe coding" class="zoomable"
+                style="width: 100%; height: auto;">
+            <figcaption style="text-align: center; padding: 0.5rem;">
+                Source: <a href="https://x.com/karpathy/status/1886192184808149383">x.com</a>
+            </figcaption>
+        </figure>
+
+        <br>
+
+        <p>
+            Vibe coding changes <b>codebase development</b> into <b>codebase querying</b>,
+            basically shifting the paradigm from AI-assisted coding to
+            (basically!) human-assisted coding.
+        </p>
+
+        <p>
+            In such a setup, individual lines of code are buried deep down in
+            the codebase. Developers don’t even need to be aware of their
+            existence. What’s required is the familiarity of what is roughly
+            there (a conceptual understanding of the system and its content) and
+            the ability to write the queries (prompts for the AI system) that
+            will extract specific information or modify the underlying data
+            (lines of code).
+        </p>
+
+        <p>
+            Take my example: as a data engineer, I’m definitely not 100%
+            proficient in all the tables there are in my system (only
+            the ones whose dbt models break :p just kiddin’). <b>And I believe I
+            don’t need to</b>. I don’t need to be familiar with all the individual
+            rows these tables contain. What’s important is to know where to
+            search for certain pieces of information. Database table abstraction
+            is tremendously helpful as it abstracts granular, incomprehensible
+            information (rows) into generic columns, arrays, and structures - no
+            need to waste my mental resources on the individual rows anymore.
+        </p>
+
+        <p>
+            AI-assistance will be particularly helpful and powerful in large
+            codebases (think 100k+ lines of code). It’s simply impossible for
+            any human being to fully understand that amount of code in detail…
+            Even PROs/craftsmen who enjoy writing the code manually can’t make
+            such claims. <b>Our context windows are simply not large enough</b>.
+        </p>
+
+        <p>
+            Humans are good at abstract reasoning, but large-scale, precise
+            calculations are painful and extremely time-consuming for our
+            brains. This is why we created computers - to outsource this mental
+            incapability to them. Same applies to coding, especially in large
+            codebases - we excel at designing and conceptualizing, but at the
+            same are quite inefficient when it comes to
+            adding/changing/optimizing code.
+        </p>
+
+        <p>
+            Coding in programming languages wasn’t invented because we enjoyed
+            it - we simply needed it because <b>it was only possible for humans to
+            learn to speak a computer language, not the other way around</b>. LLMs
+            make it possible to directly translate human language into code,
+            making them valuable proxies that can express what we mean in a
+            source code.
+        </p>
+
+        <p>
+            Isn’t it beautiful?
+        </p>
+
+
+        <div class="article-navigation">
+            <div class="nav-buttons">
+                <a href="one-branch-to-rule-them-all-4.html" class="nav-button prev-article">
+                    <div class="nav-button-content">
+                        <div class="nav-text">
+                            <div class="nav-direction">← previous article</div>
+                            <div class="nav-title">one branch to rule them all <span style="white-space: nowrap;">|
+                                    guided series #4</span></div>
+                        </div>
+                        <img src="../2025/2/image-square.webp" alt="Previous Article" class="nav-thumbnail">
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>too long; automated</h3>
+                <p class="footer-description">Exploring digital world to automate it and enjoy life. <span
+                        style="white-space: nowrap;">Written by Bartosz
+                        Miselis</span>
+                </p>
+                <br>
+                <a href="mailto:toolongautomated@gmail.com">toolongautomated@gmail.com</a>
+            </div>
+            <div class="footer-column">
+                <div class="footer-social">
+                    <div class="social-item">
+                        <img src="../../assets/github.svg" alt="GitHub" class="social-icon">
+                        <a href="https://github.com/toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/x.svg" alt="X" class="social-icon">
+                        <a href="https://x.com/bmiselis" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/linkedin.svg" alt="LinkedIn" class="social-icon">
+                        <a href="https://www.linkedin.com/in/bmiselis/" class="social-handle">bmiselis</a>
+                    </div>
+                    <div class="social-item">
+                        <img src="../../assets/youtube.svg" alt="YouTube" class="social-icon">
+                        <a href="https://www.youtube.com/@toolongautomated" class="social-handle">toolongautomated</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div id="zoom-overlay" class="zoom-overlay">
+        <img id="zoomed-img" class="zoomed-image">
+    </div>
+    <script src="../../scripts/theme.js"></script>
+    <script src="../../scripts/zoomable.js"></script>
+    <script src="../../scripts/interactions.js"></script>
+    <script src="../../highlight/highlight.min.js"></script>
+    <script src="../../scripts/progressbar.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+</body>
+
+</html>

@@ -3,7 +3,7 @@
   <!-- Main pages -->
   <url>
     <loc>https://www.toolongautomated.com/</loc>
-    <lastmod>2025-02-21</lastmod>
+    <lastmod>2025-03-11</lastmod>
   </url>
   <url>
     <loc>https://www.toolongautomated.com/about.html</loc>
@@ -11,13 +11,18 @@
   </url>
   <url>
     <loc>https://www.toolongautomated.com/archive.html</loc>
-    <lastmod>2025-02-21</lastmod>
+    <lastmod>2025-03-11</lastmod>
   </url>
 
   <!-- 2025 Posts -->
   <url>
+    <loc>https://www.toolongautomated.com/posts/2025/vibe-coding-is-not-coding.html</loc>
+    <lastmod>2025-03-11</lastmod>
+  </url>
+
+  <url>
     <loc>https://www.toolongautomated.com/posts/2025/one-branch-to-rule-them-all-4.html</loc>
-    <lastmod>2025-02-21</lastmod>
+    <lastmod>2025-03-11</lastmod>
   </url>
 
   <url>
