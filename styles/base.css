@@ -44,10 +44,14 @@ body {
     padding: 1rem;
     background: none;
     overflow-x: hidden;
+    z-index: -3;
+    position: relative;
 }
 
 main {
     background: none;
+    z-index: -2;
+    position: relative;
 }
 
 p {

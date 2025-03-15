@@ -230,3 +230,79 @@
     font-weight: normal;
     background-color: rgba(185, 150, 100, 0.2);
 }
+
+.next-steps {
+    background-color: var(--key-concept-bg);
+    padding: 1.5rem;
+    margin: 3rem 0;
+    border: 3px solid var(--border-color);
+    font-size: 0.9rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: relative;
+    text-align: center;
+    z-index: -1;
+}
+
+.buy-coffee-button {
+    padding: 0.5rem 0.8rem;
+    background-color: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    font-size: 1.5rem;
+    transition: background-color 0.2s;
+    position: relative;
+    background: #FFBF71;
+    margin: 1rem 0 2rem 0;
+}
+
+.buy-coffee-button:hover {
+    text-decoration: underline;
+}
+
+.buy-coffee-button::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+    background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
+}
+
+.join-discord-button {
+    padding: 0.5rem 0.8rem;
+    background-color: transparent;
+    border: 2px solid var(--border-color);
+    color: #fff;
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    font-size: 1.5rem;
+    transition: background-color 0.2s;
+    position: relative;
+    background: #4752C4;
+    margin-top: 1rem;
+
+}
+
+.join-discord-button:hover {
+    text-decoration: underline;
+}
+
+.join-discord-button::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    z-index: -1;
+    background-size: 3px 3px;
+    background-position: -1px -1px;
+    background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
+}
