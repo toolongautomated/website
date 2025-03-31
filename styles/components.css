@@ -275,6 +275,12 @@
     background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
 }
 
+/* Dark mode specific style for buy coffee button text */
+[data-theme="dark"] .buy-coffee-button {
+    color: #333;
+    /* Darker text for better visibility on orange bg */
+}
+
 .join-discord-button {
     padding: 0.5rem 0.8rem;
     background-color: transparent;
@@ -305,4 +311,60 @@
     background-size: 3px 3px;
     background-position: -1px -1px;
     background-image: radial-gradient(var(--shadow-color) 1px, transparent 1px);
+}
+
+/* Category badges */
+.category-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.category-badge:hover {
+    background-color: var(--accent-color);
+}
+
+.dark-mode .category-badge:hover {
+    background-color: var(--accent-color);
+}
+
+/* Heading Link Icon */
+.heading-link-icon {
+    display: inline-block;
+    margin-left: 0.4em;
+    font-size: 0.8em;
+    cursor: pointer;
+    visibility: hidden;
+    opacity: 0.7;
+    text-decoration: none;
+    user-select: none;
+}
+
+/* Show icon on heading hover (h2-h6 only) */
+main h2:hover .heading-link-icon,
+main h3:hover .heading-link-icon,
+main h4:hover .heading-link-icon,
+main h5:hover .heading-link-icon,
+main h6:hover .heading-link-icon {
+    visibility: visible;
+}
+
+/* Make icon fully opaque when hovering directly over it */
+.heading-link-icon:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Remove padding adjustments from media query */
+@media (max-width: 768px) {
+    .heading-link-icon {
+        font-size: 0.7em;
+    }
 }
